@@ -4,3 +4,4 @@ dist-standalone
 deliverables
 screenshots
 .vercel
+.env*
