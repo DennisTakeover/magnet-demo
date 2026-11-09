@@ -171,9 +171,14 @@ export default function Overview() {
   });
   const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const TONES = ['lavender', 'blue', 'yellow', 'mint'];
+
   return (
     <>
       <PageHeader
+        eyebrow={<span className="ov-greet">{greet}, {state.business.owner.split(' ')[0]}</span>}
         title={t('ov.title')}
         subtitle={t('ov.sub')}
         actions={
@@ -207,36 +212,52 @@ export default function Overview() {
         example={[{ label: 'This week', value: '3 posts scheduled, 1 draft' }, { label: 'Idea from Inbox', value: '“Most asked: how long does it take?”' }, { label: 'Link a Lead Flow', value: 'Goes live when the post is published' }]}
       />
 
-      <div className="metric-grid">
-        {tiles.map((t, i) => {
-          const Icon = t.icon;
-          const d = m.deltas[i];
-          return (
-            <a key={t.label} className="metric" href={`#${t.href}`}>
-              <span className="metric-top">
-                <Icon size={20} aria-hidden className="metric-icon" />
-                <span className="metric-label">{t.label}</span>
-                <span className="info" tabIndex={0} aria-label={defs[i]} data-tip={defs[i]}>
-                  <Info size={14} aria-hidden />
-                </span>
-              </span>
-              <span className="metric-row">
-                <span className="metric-value">{t.value}</span>
-                <Spark values={SPARKS[i]} />
-              </span>
+      <section className="ov-hero" aria-label="Key numbers">
+        <div className="card ov-chart-card" aria-labelledby="trend">
+          <div className="ov-chart-head">
+            <div>
+              <h2 id="trend">Followers</h2>
+              <span className="ov-big">{persona.trendEnd.toLocaleString('en-GB')}</span>
               <span className="metric-delta">
-                {d > 0 ? <><ArrowUpRight size={14} aria-hidden /> +{d}%</> : '0%'}
-                <span className="muted"> vs previous {period} days</span>
+                {m.deltas[0] > 0 ? <><ArrowUpRight size={14} aria-hidden /> +{m.deltas[0]}%</> : '0%'}
+                <span className="muted"> +{m.growth} in {period} days · example data</span>
               </span>
-            </a>
-          );
-        })}
-      </div>
+            </div>
+            <span className="chip-static">Audience</span>
+          </div>
+          <TrendChart period={period} />
+        </div>
+        <div className="ov-tiles">
+          {tiles.map((tile, i) => {
+            const Icon = tile.icon;
+            const d = m.deltas[i];
+            return (
+              <a key={tile.label} className={`metric ov-tile tone-${TONES[i]}`} href={`#${tile.href}`}>
+                <span className="metric-top">
+                  <span className="ov-tile-icon"><Icon size={18} aria-hidden /></span>
+                  <span className="metric-label">{tile.label}</span>
+                  <span className="info" tabIndex={0} aria-label={defs[i]} data-tip={defs[i]}>
+                    <Info size={14} aria-hidden />
+                  </span>
+                </span>
+                <span className="metric-row">
+                  <span className="metric-value">{tile.value}</span>
+                  <Spark values={SPARKS[i]} />
+                </span>
+                <span className="metric-delta">
+                  {d > 0 ? <><ArrowUpRight size={14} aria-hidden /> +{d}%</> : '0%'}
+                  <span className="muted"> vs prev. {period} days</span>
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="ov-row">
         <section className="card moves" aria-labelledby="moves">
           <div className="card-head">
-            <h2 id="moves">Your next moves</h2>
+            <h2 id="moves">Today’s focus {moves.length > 0 && <span className="title-badge sm">{moves.length}</span>}</h2>
             {moves.length > 3 && (
               <button className="link-btn" onClick={() => setAllMoves(!allMoves)}>
                 {allMoves ? 'Show less' : 'View all'} <ArrowRight size={16} />
@@ -245,7 +266,7 @@ export default function Overview() {
           </div>
           {moves.length === 0 && <p className="muted">You’re all caught up.</p>}
           <ul className="move-list">
-            {(allMoves ? moves : moves.slice(0, 3)).map((mv, i) => {
+            {(allMoves ? moves : moves.slice(0, 4)).map((mv, i) => {
               const Icon = mv.icon;
               return (
                 <li key={mv.title} className="move">
@@ -254,24 +275,49 @@ export default function Overview() {
                     <strong>{mv.title}</strong>
                     <span className="muted clamp-1">{mv.sub}</span>
                   </span>
-                  <a className={`btn ${i === 0 ? 'btn-primary' : 'btn-soft'}`} href={`#${mv.href}`}>{mv.cta}</a>
-                  <ChevronRight size={18} aria-hidden className="muted hide-sm" />
+                  <a className={`btn btn-sm ${i === 0 ? 'btn-primary' : 'btn-soft'}`} href={`#${mv.href}`}>{mv.cta}</a>
                 </li>
               );
             })}
           </ul>
         </section>
 
+        <section className="card" aria-labelledby="recent">
+          <div className="card-head">
+            <h2 id="recent">Inbox {waiting.length > 0 && <span className="title-badge sm">{waiting.length} to review</span>}</h2>
+            <a className="link-btn" href="#/app/inbox">Open <ArrowRight size={16} /></a>
+          </div>
+          {convs.length === 0 && <p className="muted">No conversations yet.</p>}
+          <ul className="recent-list">
+            {convs.slice(0, 4).map((c) => {
+              const last = [...c.messages].reverse().find((x) => x.from !== 'event');
+              return (
+                <li key={c.id}>
+                  <a href={`#/app/inbox/${c.id}`} className="recent">
+                    {c.unread ? <span className="unread-dot" aria-label="Unread" /> : <span className="unread-dot off" aria-hidden />}
+                    <Avatar name={c.name} color={c.color} size={42} />
+                    <span className="recent-body">
+                      <span className="recent-top"><strong>{c.name}</strong><span className="muted xsmall">{timeAgo(c.lastAt)}</span></span>
+                      <span className="muted small clamp-1">{last?.text}</span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      </div>
+
+      <div className="ov-row ov-row-c">
         {flow && (
           <section className="card flow-spot" aria-labelledby="flowspot">
             <div className="card-head">
-              <h2 id="flowspot">{flow.name} flow</h2>
+              <h2 id="flowspot">{flow.name}</h2>
               <FlowStatusBadge status={flow.status} />
             </div>
-            <p className="muted">Turn curious followers into qualified leads.</p>
-            <span className="eyebrow-label">Keyword</span>
+            <p className="muted small">Lead Flow · turns curious followers into qualified leads.</p>
             <div className="kw-box">
-              <span>{flow.trigger.keyword}</span>
+              <span><small>Keyword</small>{flow.trigger.keyword}</span>
               <button
                 className="icon-btn"
                 aria-label="Copy keyword"
@@ -285,73 +331,38 @@ export default function Overview() {
               <div><strong>{flow.stats.sent}</strong><span>sent</span></div>
               <div><strong>{flow.stats.clicks}</strong><span>link clicks</span></div>
             </div>
-            <a className="btn btn-outline-blue btn-block" href={`#/app/flows/${flow.id}`}>View flow <ArrowRight size={16} /></a>
+            <a className="btn btn-secondary btn-block" href={`#/app/flows/${flow.id}`}>View flow <ArrowRight size={16} /></a>
           </section>
         )}
-      </div>
 
-      <div className="ov-row ov-row-b">
-        <section className="card" aria-labelledby="trend">
+        <section className="card" aria-labelledby="week">
           <div className="card-head">
-            <h2 id="trend">Audience trend <span className="muted head-note">Example data</span></h2>
-            <span className="chip-static">Followers</span>
-          </div>
-          <TrendChart period={period} />
-        </section>
-
-        <section className="card" aria-labelledby="recent">
-          <div className="card-head">
-            <h2 id="recent">Recent conversations</h2>
-            <a className="link-btn" href="#/app/inbox">View all <ArrowRight size={16} /></a>
-          </div>
-          {convs.length === 0 && <p className="muted">No conversations yet.</p>}
-          <ul className="recent-list">
-            {convs.slice(0, 3).map((c) => {
-              const last = [...c.messages].reverse().find((x) => x.from !== 'event');
-              return (
-                <li key={c.id}>
-                  <a href={`#/app/inbox/${c.id}`} className="recent">
-                    <Avatar name={c.name} color={c.color} size={44} />
-                    <span className="recent-body">
-                      <span className="recent-top"><strong>{c.name}</strong><span className="muted xsmall">{timeAgo(c.lastAt)}</span></span>
-                      <span className="muted small clamp-1">{last?.text}</span>
-                    </span>
-                    {c.unread && <span className="unread-dot" aria-label="Unread" />}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      </div>
-
-      <section className="card" aria-labelledby="week">
-        <div className="card-head">
-          <h2 id="week">This week’s content</h2>
-          <div className="row gap-sm">
-            <span className="muted small">{fmt(week[0].d)} – {fmt(week[6].d)}</span>
-            <button className="icon-btn round" aria-label="Previous week" onClick={() => setWeekOffset(weekOffset - 1)}><ChevronLeft size={16} /></button>
-            <button className="icon-btn round" aria-label="Next week" onClick={() => setWeekOffset(weekOffset + 1)}><ChevronRight size={16} /></button>
-          </div>
-        </div>
-        <div className="week-strip">
-          {week.map(({ d, iso, post }) => (
-            <div key={iso} className="week-day">
-              <span className="week-label">
-                <strong>{d.toLocaleDateString('en-GB', { weekday: 'short' })}</strong>
-                <span className="muted">{fmt(d)}</span>
-              </span>
-              {post ? (
-                <a href={`#/app/planner/${post.id}`} className="week-tile" aria-label={`${post.title}, ${post.status}`}>
-                  <PostTile post={post} />
-                </a>
-              ) : (
-                <a href="#/app/planner" className="week-empty" aria-label={`No post on ${fmt(d)}. Open Planner`}>+</a>
-              )}
+            <h2 id="week">This week’s content</h2>
+            <div className="row gap-sm">
+              <span className="muted small">{fmt(week[0].d)} – {fmt(week[6].d)}</span>
+              <button className="icon-btn round" aria-label="Previous week" onClick={() => setWeekOffset(weekOffset - 1)}><ChevronLeft size={16} /></button>
+              <button className="icon-btn round" aria-label="Next week" onClick={() => setWeekOffset(weekOffset + 1)}><ChevronRight size={16} /></button>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="week-strip">
+            {week.map(({ d, iso, post }) => (
+              <div key={iso} className="week-day">
+                <span className="week-label">
+                  <strong>{d.toLocaleDateString('en-GB', { weekday: 'short' })}</strong>
+                  <span className="muted">{fmt(d)}</span>
+                </span>
+                {post ? (
+                  <a href={`#/app/planner/${post.id}`} className="week-tile" aria-label={`${post.title}, ${post.status}`}>
+                    <PostTile post={post} />
+                  </a>
+                ) : (
+                  <a href="#/app/planner" className="week-empty" aria-label={`No post on ${fmt(d)}. Open Planner`}>+</a>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
       <p className="sample-note">All numbers are fictional sample data, not MAGNET results. Growth, conversations and leads are separate measures, not a funnel.</p>
     </>
   );
