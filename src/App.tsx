@@ -1,13 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   House, BarChart3, MessageCircle, Link2, Users, CalendarDays, Settings as SettingsIcon, HelpCircle,
-  Activity as ActivityIcon, Building2, LifeBuoy, Gauge, Menu, X, CheckCircle2, Info, AlertTriangle, XCircle, WifiOff, ChevronDown, Rocket, MessagesSquare, CreditCard, Lock, Handshake, Tags, LineChart,
+  Activity as ActivityIcon, Building2, LifeBuoy, Gauge, Menu, X, CheckCircle2, Info, AlertTriangle, XCircle, WifiOff, Rocket, MessagesSquare, CreditCard, Lock, Handshake, Tags, LineChart,
 } from 'lucide-react';
 import { useRoute, useStore } from './store';
 import { applyStage4Label, Avatar, Skeleton } from './components/ui';
 import { t } from './i18n/locale';
 import { setActiveLocale } from './i18n/locale';
 import DemoControls from './components/DemoControls';
+import AccountSwitcher from './components/AccountSwitcher';
 import Entry from './screens/Entry';
 import Onboarding from './screens/Onboarding';
 import Overview from './screens/Overview';
@@ -141,18 +142,7 @@ function Shell({ role, path, children }: { role: 'client' | 'admin'; path: strin
           </button>
         </div>
         {role === 'client' ? (
-          <a className="user-card" href="#/app/connect">
-            <Avatar name={viewer(state)?.name ?? state.business.owner} color={viewer(state) ? '#12805C' : '#5B35F5'} size={40} />
-            <span className="user-card-text">
-              <strong>{viewer(state)?.name ?? state.business.owner}</strong>
-              <span className={`conn ${state.connection}`}>
-                <span className="badge-dot" aria-hidden />
-                {state.clients[0].handle}{state.connection === 'disconnected' ? ' · Disconnected' : ''}
-                <span className="sr-only">{state.connection === 'connected' ? ', connected' : ''}</span>
-              </span>
-            </span>
-            <ChevronDown size={16} aria-hidden />
-          </a>
+          <AccountSwitcher />
         ) : (
           <div className="user-card">
             <Avatar name="Sophie Laurent" color="#15171C" size={40} />

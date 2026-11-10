@@ -15,6 +15,12 @@ export function clientActor(s: Pick<State, 'business'>): string {
   return `${s.business.owner} (client)`;
 }
 
+const SECOND_ACCOUNT: Record<PersonaId, { username: string; label: string; color: string }> = {
+  coach: { username: 'jordanhale.coach', label: 'Personal brand', color: '#E1622C' },
+  webshop: { username: 'noor.studio', label: 'Studio & behind the scenes', color: '#B4235A' },
+  store: { username: 'bikecorner.workshop', label: 'Workshop & repairs', color: '#12805C' },
+};
+
 export function createSeed(persona: PersonaId = 'coach'): State {
   const now = Date.now();
   const ago = (ms: number) => now - ms;
@@ -78,7 +84,7 @@ export function createSeed(persona: PersonaId = 'coach'): State {
   ];
 
   return {
-    version: 14,
+    version: 15,
     persona,
     onboarded: true,
     business: p.business,
@@ -99,7 +105,7 @@ export function createSeed(persona: PersonaId = 'coach'): State {
     sources: p.sources,
     campaign: 'active',
     interactions: { ...cfg.interactions, breakdown: { ...cfg.interactions.breakdown } },
-    conversations: p.conversations,
+    conversations: p.conversations.map((c, i) => ({ ...c, accountId: i % 3 === 2 ? 'acc2' : 'acc1' })),
     commentTargets: p.commentTargets,
     commentDrafts: p.commentDrafts,
     leads: p.leads,
@@ -146,6 +152,11 @@ export function createSeed(persona: PersonaId = 'coach'): State {
       { id: 'tm1', name: 'Sara Okafor', email: 'sara@example.com', modules: ['inbox'], permissions: { sendReplies: true, manageFlows: false, publish: false }, status: 'active', invitedAt: ago(12 * DAY) },
     ],
     viewAs: null,
+    accounts: [
+      { id: 'acc1', username: p.admin.handle.replace('@', ''), label: 'Main business', color: '#5B35F5', status: 'connected', growth: 'connected', connectedAt: ago(7 * DAY), primary: true },
+      { id: 'acc2', ...SECOND_ACCOUNT[persona], status: 'connected', growth: 'connected', connectedAt: ago(4 * DAY), primary: false },
+    ],
+    activeAccount: 'all',
     sim: { emptyInbox: false, missingKnowledge: false, slowLoading: false, failNextPublish: false, billingDown: false },
     processedEvents: executions.map((e) => e.eventId),
     plan: { name: p.admin.plan, status: 'Trial', trialEnds: isoDate(9) },

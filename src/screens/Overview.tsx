@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight, CalendarDays, CalendarCheck, ChevronDown, ChevronLeft, ChevronRight, Copy, Info, MessageCircle, UserRound, Users, AlertTriangle, Workflow } from 'lucide-react';
 import { usePersona, useStore } from '../store';
+import { inAccount } from '../accounts';
 import UpgradeHint from '../components/UpgradeHint';
 import { fmtDate } from '../billing';
 import Checklist from '../components/Checklist';
@@ -131,7 +132,7 @@ export default function Overview() {
   const m = persona.metrics[period];
   const defs = [...DEFS, persona.stage4Definition];
 
-  const convs = state.sim.emptyInbox ? [] : [...state.conversations].sort((a, b) => b.lastAt - a.lastAt);
+  const convs = state.sim.emptyInbox ? [] : inAccount(state, [...state.conversations]).sort((a, b) => b.lastAt - a.lastAt);
   const waiting = convs.filter((c) => (c.needsYou || c.unread) && !c.takenOver);
   const suggested = state.sources.filter((s) => s.status === 'suggested');
   const toBook = state.leads.filter((l) => l.status === 'qualified');

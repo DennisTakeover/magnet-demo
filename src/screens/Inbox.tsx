@@ -4,6 +4,7 @@ import {
   Inbox as InboxIcon, Pencil, ArrowUpRight, Check, Megaphone, Tag, MousePointerClick, Target, StickyNote, MoreHorizontal, SquarePen, FileText,
 } from 'lucide-react';
 import { clientLog, clockTime, markActivation, navigate, uid, usePersona, useStore } from '../store';
+import { accountLabel, inAccount } from '../accounts';
 import { can } from '../team';
 import UpgradeHint from '../components/UpgradeHint';
 import OpsBanner from '../components/OpsBanner';
@@ -37,7 +38,8 @@ export default function Inbox({ id }: { id?: string }) {
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
 
-  const all = state.sim.emptyInbox ? [] : [...state.conversations].sort((a, b) => b.lastAt - a.lastAt);
+  const all = state.sim.emptyInbox ? [] : inAccount(state, [...state.conversations]).sort((a, b) => b.lastAt - a.lastAt);
+  const multi = state.accounts.length > 1 && state.activeAccount === 'all';
   const list = all.filter((c) => {
     if (q && !`${c.name} ${c.handle} ${c.messages.map((m) => m.text).join(' ')}`.toLowerCase().includes(q.toLowerCase())) return false;
     if (filter === 'unread') return c.unread;
@@ -47,7 +49,7 @@ export default function Inbox({ id }: { id?: string }) {
   });
   const active = all.find((c) => c.id === id);
 
-  const toReview = state.conversations.filter((c) => c.unread || c.needsYou).length;
+  const toReview = inAccount(state, state.conversations).filter((c) => c.unread || c.needsYou).length;
   const header = <><PageHeader title={<>{t('nav.inbox')}{toReview > 0 && <span className="title-badge">{toReview} to review</span>}</>} subtitle={t('inbox.sub')} /><OpsBanner module="ai" /><OpsBanner module="flows" /></>;
 
   if (all.length === 0) {
@@ -107,6 +109,7 @@ export default function Inbox({ id }: { id?: string }) {
                       <span className="conv-time">{timeAgo(c.lastAt)}</span>
                     </span>
                     <span className="conv-snippet">{lastText(c)}</span>
+                    {multi && <span className="acct-chip"><i style={{ background: state.accounts.find((a) => a.id === (c.accountId ?? 'acc1'))?.color }} />{accountLabel(state, c.accountId)}</span>}
                     {(c.needsYou || c.takenOver || c.awaitingReply) && (
                       <span className="conv-tags">
                         {c.needsYou && <Badge tone="red">Needs you</Badge>}

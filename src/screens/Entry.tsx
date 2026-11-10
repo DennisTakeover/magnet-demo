@@ -63,15 +63,21 @@ export default function Entry({ page = 'home' }: { page?: PublicPage }) {
 function Home() {
   const { state, reset } = useStore();
   return (
-    <main>
+    <main className="m-home">
       <section className="m-hero">
+        <span className="m-pill"><Sparkles size={14} aria-hidden /> AI replies you approve, in your own tone</span>
         <h1 className="m-hero-title">Grow your audience<br />with AI.</h1>
         <p className="m-hero-lead">Turn conversations into opportunities.</p>
-        <p className="m-hero-sub">Your audience, conversations and next customers. Together.</p>
+        <p className="m-hero-sub">Reach the right people, answer every DM and turn interest into bookings and orders. All from one place.</p>
         <div className="m-ctas">
-          <a className="btn btn-primary btn-lg" href="#/onboarding">Get started</a>
-          <a className="btn btn-secondary btn-lg" href="#/app/overview"><Play size={16} fill="currentColor" /> Explore the demo</a>
+          <a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="hero-start">Start free setup <ArrowRight size={18} /></a>
+          <a className="btn btn-secondary btn-lg" href="#/app/overview" data-cta="hero-demo"><Play size={16} fill="currentColor" /> Explore the demo</a>
         </div>
+        <ul className="m-reassure" aria-label="Good to know">
+          <li><Check size={15} aria-hidden /> Free to set up</li>
+          <li><Lock size={15} aria-hidden /> No password needed</li>
+          <li><Check size={15} aria-hidden /> Cancel any time</li>
+        </ul>
 
         <div className="m-hero-stage">
           <img className="m-photo m-photo-a" src={img('man-curly')} alt="" />
@@ -82,28 +88,56 @@ function Home() {
         </div>
       </section>
 
+      <section className="m-trust" aria-label="Why owners trust it">
+        <span><Instagram size={18} aria-hidden /> Official Instagram login</span>
+        <span><ShieldCheck size={18} aria-hidden /> You approve every AI reply</span>
+        <span><SlidersHorizontal size={18} aria-hidden /> Daily limits you control</span>
+        <span><Layers size={18} aria-hidden /> Only pay for the modules you use</span>
+      </section>
+
+      <section className="m-section">
+        <div className="m-section-head">
+          <span className="m-kicker">Sound familiar?</span>
+          <h2 className="m-h2">Instagram works. Keeping up with it doesn’t.</h2>
+        </div>
+        <div className="m-pains">
+          {[
+            ['DMs pile up', 'Questions wait for days, and warm leads go cold before you answer.', 'Every DM gets a suggested reply in your tone. You approve it in seconds.'],
+            ['Comments go nowhere', 'People comment “interested” under a post, and nothing happens next.', 'A Lead Flow sends your guide the moment they use your keyword.'],
+            ['Growth is guesswork', 'You post and hope the right people find you.', 'Grow reaches people who match your audience, within your daily limit.'],
+          ].map(([t, pain, fix]) => (
+            <article key={t} className="m-pain">
+              <strong>{t}</strong>
+              <p className="m-pain-q">{pain}</p>
+              <p className="m-pain-a"><ArrowRight size={16} aria-hidden /> {fix}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="m-section" id="how">
         <div className="m-section-head">
           <span className="m-kicker">How it works</span>
-          <h2 className="m-h2">From follower to customer, in one place.</h2>
+          <h2 className="m-h2">Live in three steps.</h2>
+          <p className="m-sub">Most owners finish setup in one sitting.</p>
         </div>
-        <div className="m-steps">
+        <div className="m-steps three">
           {[
-            [Users, 'Choose your audience', 'Topics, regions and example accounts. You stay in control with blocked words and protected accounts.'],
-            [BarChart3, 'Grow within your limit', 'MAGNET reaches people who match your audience, within a daily limit you set.'],
-            [MessageCircle, 'Reply with AI', 'Every DM gets a suggested reply in your tone. You approve, edit or take over.'],
-            [Workflow, 'Turn interest into leads', 'Lead Flows deliver your guide on a keyword. Qualified contacts land in your pipeline.'],
+            [Instagram, 'Connect Instagram', 'Log in on Instagram’s own screen and approve access. About 2 minutes.'],
+            [Users, 'Describe your audience', 'Topics, regions and example accounts. MAGNET suggests the rest. About 5 minutes.'],
+            [MessageCircle, 'Approve your first reply', 'Open a conversation, check the AI draft and send. That’s your first result.'],
           ].map(([Icon, t, d], i) => {
             const I = Icon as typeof Users;
             return (
               <div key={t as string} className="m-step">
                 <span className={`m-icon tone-${i}`}><I size={22} aria-hidden /></span>
-                <div><strong>{t as string}</strong><p>{d as string}</p></div>
-                {i < 3 && <ChevronRight className="m-step-arrow" size={20} aria-hidden />}
+                <div><span className="m-step-n">Step {i + 1}</span><strong>{t as string}</strong><p>{d as string}</p></div>
+                {i < 2 && <ChevronRight className="m-step-arrow" size={20} aria-hidden />}
               </div>
             );
           })}
         </div>
+        <div className="m-ctas center-cta"><a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="steps-start">Start free setup <ArrowRight size={18} /></a></div>
       </section>
 
       <section className="m-section m-features">
@@ -113,7 +147,7 @@ function Home() {
           [Users, 'Leads', 'One pipeline with a clear next step: a booking, an order or a store visit.', '/app/leads'],
           [CalendarDays, 'Planner', 'Plan posts and attach a Lead Flow, so your content feeds your pipeline.', '/app/planner'],
           [MessagesSquare, 'Comments', 'Useful comment drafts for posts your audience already reads. You approve each one.', '/app/comments'],
-          [ShieldCheck, 'Secure by design', 'Connect with Instagram’s own login. We never see or store your password.', '/app/connect'],
+          [Layers, 'Multiple accounts', 'Run your business and personal brand, or several shops, from one workspace.', '/app/connect'],
         ].map(([Icon, t, d, href]) => {
           const I = Icon as typeof Users;
           return (
@@ -121,15 +155,37 @@ function Home() {
               <span className="m-icon"><I size={20} aria-hidden /></span>
               <strong>{t as string}</strong>
               <p>{d as string}</p>
-              <span className="m-more">Open in demo <ArrowRight size={14} /></span>
+              <span className="m-more">See it in the demo <ArrowRight size={14} /></span>
             </a>
           );
         })}
       </section>
 
+      <section className="m-section m-control">
+        <div>
+          <span className="m-kicker">You stay in control</span>
+          <h2 className="m-h2">Automation that never acts behind your back.</h2>
+          <ul className="m-checks big">
+            <li><Check size={18} /> Assist mode by default: you approve every AI reply</li>
+            <li><Check size={18} /> Complaints and requests for a person always come to you</li>
+            <li><Check size={18} /> Daily limits, blocked words and protected accounts you set</li>
+            <li><Check size={18} /> Pause everything in one click, any time</li>
+            <li><Check size={18} /> We never ask for or store your Instagram password</li>
+          </ul>
+        </div>
+        <div className="m-control-art" aria-hidden>
+          <img className="m-photo" src={img('woman-portrait')} alt="" />
+          <div className="m-approve-card">
+            <span className="ai-label"><Sparkles size={14} /> AI draft</span>
+            <p>Yes, we can fit it around your travel. What’s the biggest challenge right now?</p>
+            <span className="m-approve-actions"><span className="btn btn-sm btn-secondary">Edit</span><span className="btn btn-sm btn-primary">Approve &amp; send</span></span>
+          </div>
+        </div>
+      </section>
+
       <section className="m-section">
         <div className="m-section-head">
-          <span className="m-kicker">Made for your business</span>
+          <span className="m-kicker">Built for businesses like yours</span>
           <h2 className="m-h2">See it with your kind of business.</h2>
           <p className="m-sub">Pick an example. Conversations, Lead Flows, goals and numbers all match that business.</p>
         </div>
@@ -152,19 +208,30 @@ function Home() {
         </div>
       </section>
 
-      <section className="m-section m-split">
-        <div>
+      <section className="m-section" id="pricing-preview">
+        <div className="m-section-head">
           <span className="m-kicker">Pricing</span>
-          <h2 className="m-h2">Your business.<br />Your setup.</h2>
-          <p className="m-sub">Pick only the modules you need. Starter from {money(97)} a month, everything for {money(297)}.</p>
-          <a className="btn btn-primary btn-lg" href="#/pricing">Build your plan <ArrowRight size={18} /></a>
+          <h2 className="m-h2">Simple plans. Change any time.</h2>
+          <p className="m-sub">Start small and add modules when you need them. Prices in {state.locale.currency}.</p>
         </div>
-        <div>
-          <span className="m-kicker">Partners</span>
-          <h2 className="m-h2">Your network.<br />Shared growth.</h2>
-          <p className="m-sub">Introduce MAGNET to your audience and earn {PROGRAM_RATE}% of what the customers you refer pay.</p>
-          <a className="btn btn-secondary btn-lg" href="#/partners">Become a partner <ArrowRight size={18} /></a>
+        <div className="m-plans">
+          <article className="m-plan">
+            <span className="m-plan-name">Starter</span>
+            <span className="m-plan-price">{money(97)}<small>/month</small></span>
+            <p className="muted">Grow your audience and never miss a DM.</p>
+            <ul className="m-checks"><li><Check size={16} /> Grow</li><li><Check size={16} /> AI Inbox</li><li><Check size={16} /> Leads, overview and support</li></ul>
+            <a className="btn btn-secondary btn-block btn-lg" href="#/onboarding" data-cta="plan-starter">Start with Starter</a>
+          </article>
+          <article className="m-plan featured">
+            <span className="m-plan-tag">Most complete</span>
+            <span className="m-plan-name">Growth</span>
+            <span className="m-plan-price">{money(297)}<small>/month</small></span>
+            <p>Everything to turn followers into customers.</p>
+            <ul className="m-checks"><li><Check size={16} /> Everything in Starter</li><li><Check size={16} /> Lead Flows and Comments</li><li><Check size={16} /> Planner with linked flows</li></ul>
+            <a className="btn btn-primary btn-block btn-lg" href="#/onboarding" data-cta="plan-growth">Start with Growth</a>
+          </article>
         </div>
+        <p className="m-plan-more"><a href="#/pricing">Build your own plan from modules <ArrowRight size={14} /></a> · <a href="#/app/dfy">Prefer we run it for you?</a></p>
       </section>
 
       <section className="m-section lfaq" id="faq">
@@ -175,9 +242,12 @@ function Home() {
         <div className="lfaq-list">
           {[
             ['Does MAGNET need my Instagram password?', 'No. You connect through Instagram’s own login and approve access there, just like “Log in with Google”. MAGNET never sees or stores your password.'],
+            ['Is it safe for my Instagram account?', 'MAGNET uses the official Instagram connection for messages and content, and growth runs within a daily limit you set. You can pause everything in one click.'],
             ['Will AI send messages without me?', 'Only if you choose Auto mode. The default is Assist, where you approve every message. Complaints and requests for a person always come to you.'],
+            ['How much time does it take?', 'Setup takes one sitting. After that, most days are a few minutes of approving replies and checking your leads.'],
+            ['Can I connect more than one account?', 'Yes. Connect several Instagram accounts, for example your business and your personal brand, and switch between them or see everything together.'],
+            ['Can I change my plan or cancel?', 'Yes, yourself, in Billing. Adding a module starts right away; removing one or cancelling takes effect at your next renewal. Your data is kept.'],
             ['What counts as a lead?', 'A new follower or a guide request is not a lead by itself. Contacts become Qualified when they meet your criteria; only a confirmed booking, order or visit moves them to the final stage.'],
-            ['Can I change my plan later?', 'Yes. Add a module and it starts right away; remove one and it stops at your next renewal. Your data is kept.'],
             ['Is this a live product?', 'This is an interactive demo with fictional people and sample numbers. It does not connect to Instagram and never sends real messages, posts or payments.'],
           ].map(([q, a]) => (
             <details key={q} className="lfaq-item">
@@ -188,15 +258,23 @@ function Home() {
         </div>
       </section>
 
-      <section className="m-section m-final">
-        <h2 className="m-hero-title sm">Ready when you are.</h2>
-        <p className="m-hero-sub">Explore the full workspace with example data. No sign-up, nothing sent to Instagram.</p>
-        <div className="m-ctas">
-          <a className="btn btn-primary btn-lg" href="#/onboarding">Get started</a>
-          <a className="btn btn-secondary btn-lg" href="#/app/overview">Explore the demo</a>
+      <section className="m-section">
+        <div className="m-final-band">
+          <MagnetArt className="m-final-magnet" size={220} rotate={-20} />
+          <h2 className="m-hero-title sm">Ready to turn followers into customers?</h2>
+          <p>Set up in one sitting. Free to start, no password needed.</p>
+          <div className="m-ctas">
+            <a className="btn btn-white btn-lg" href="#/onboarding" data-cta="final-start">Start free setup <ArrowRight size={18} /></a>
+            <a className="btn btn-outline-white btn-lg" href="#/app/overview" data-cta="final-demo">Explore the demo</a>
+          </div>
         </div>
-        <button className="link-btn cta-reset" onClick={() => { reset(); navigate('/'); }}><RotateCcw size={14} /> Reset demo</button>
+        <p className="center"><button className="link-btn cta-reset" onClick={() => { reset(); navigate('/'); }}><RotateCcw size={14} /> Reset demo</button></p>
       </section>
+
+      <div className="m-sticky-cta" role="complementary" aria-label="Get started">
+        <span><strong>magnet</strong> · free to set up</span>
+        <a className="btn btn-primary" href="#/onboarding" data-cta="sticky-start">Start free</a>
+      </div>
     </main>
   );
 }

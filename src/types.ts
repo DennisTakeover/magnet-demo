@@ -92,6 +92,8 @@ export interface Conversation {
   followedAt?: string;
   /** Lead Flow execution waiting for the contact to tap the opening button */
   pendingFlowExecId?: string;
+  /** The Instagram account that received this conversation */
+  accountId?: string;
   /** What AI can't answer from business knowledge, shown when it asks for review */
   reviewTopic?: string;
   note?: string;
@@ -396,6 +398,9 @@ export interface State {
   /** Upgrade hints the owner dismissed ("module:context") */
   dismissedHints: string[];
   team: TeamMember[];
+  accounts: IgAccount[];
+  /** Which account the workspace is filtered to ('all' shows everything) */
+  activeAccount: string;
   /** Demo: preview the app as this team member (null = owner) */
   viewAs: string | null;
   priceVersions: PriceVersion[];
@@ -606,4 +611,19 @@ export interface TeamMember {
   permissions: MemberPermissions;
   status: 'invited' | 'active';
   invitedAt: number;
+}
+
+/* ───────────── Multiple Instagram accounts ───────────── */
+
+export interface IgAccount {
+  id: string;
+  username: string;
+  /** What the owner uses this account for, e.g. "Main business" */
+  label: string;
+  color: string;
+  status: 'connected' | 'disconnected';
+  /** Growth engine mapping for this account (confirmed per account) */
+  growth: GrowthConnection;
+  connectedAt: number | null;
+  primary: boolean;
 }

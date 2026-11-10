@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, Cpu, Instagram, Lock, RefreshCw, ShieldCheck, Unplug } from 'lucide-react';
-import { clientLog, logActivity, markActivation, navigate, useStore } from '../store';
-import { Badge, Modal, PageHeader, dateTime } from '../components/ui';
+import { clientLog, logActivity, markActivation, navigate, routeQuery, uid, useStore } from '../store';
+import { MAX_ACCOUNTS, accountGrowth, accountStatus } from '../accounts';
+import { Avatar, Badge, Modal, PageHeader, dateTime } from '../components/ui';
 
 /**
  * Connection screen. The Instagram link uses an OAuth-style flow: the person authorises
@@ -11,7 +12,51 @@ import { Badge, Modal, PageHeader, dateTime } from '../components/ui';
 export default function Connect() {
   const { state, update, toast } = useStore();
   const [authOpen, setAuthOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const meta = state.meta;
+  useEffect(() => {
+    if (routeQuery().get('add') === '1') setAddOpen(true);
+  }, []);
+  const COLORS = ['#2F6FE8', '#E1622C', '#12805C', '#B4235A', '#0E7490', '#A35A00'];
+
+  const addAccount = (username: string) => {
+    const id = uid('acc');
+    let added = true;
+    update((d) => {
+      if (d.accounts.length >= MAX_ACCOUNTS || d.accounts.some((a) => a.username.toLowerCase() === username.toLowerCase())) { added = false; return; }
+      d.accounts.push({ id, username, label: 'New account', color: COLORS[d.accounts.length % COLORS.length], status: 'connected', growth: 'pending', connectedAt: Date.now(), primary: false });
+      clientLog(d, 'setting', `Connected another Instagram account @${username} (demo)`);
+    });
+    setAddOpen(false);
+    if (!added) return toast('That account is already connected, or you reached the account limit.', 'warning');
+    toast(`@${username} connected. The growth service is confirming it.`, 'success');
+    window.setTimeout(() => {
+      update((d) => {
+        const a = d.accounts.find((x) => x.id === id);
+        if (a && a.growth === 'pending') a.growth = 'connected';
+      });
+    }, 1800);
+  };
+
+  const setAccount = (id: string, status: 'connected' | 'disconnected') => {
+    update((d) => {
+      const a = d.accounts.find((x) => x.id === id)!;
+      a.status = status;
+      a.connectedAt = status === 'connected' ? Date.now() : null;
+      clientLog(d, 'setting', `${status === 'connected' ? 'Reconnected' : 'Disconnected'} @${a.username} (demo)`);
+    });
+    toast(status === 'connected' ? 'Account reconnected' : 'Account disconnected. Its conversations and leads are kept.', status === 'connected' ? 'success' : 'info');
+  };
+
+  const removeAccount = (id: string) => {
+    update((d) => {
+      const a = d.accounts.find((x) => x.id === id)!;
+      d.accounts = d.accounts.filter((x) => x.id !== id);
+      if (d.activeAccount === id) d.activeAccount = 'all';
+      clientLog(d, 'setting', `Removed @${a.username} from the workspace`);
+    });
+    toast('Account removed from MAGNET. Nothing changes on Instagram itself.', 'info');
+  };
 
   const connectMeta = (username: string) => {
     update((d) => {
@@ -105,6 +150,46 @@ export default function Connect() {
         )}
       </section>
 
+      <section className="card accounts-card" aria-labelledby="accts">
+        <div className="card-head">
+          <div>
+            <h2 id="accts">Instagram accounts <span className="muted head-note">{state.accounts.length} of {MAX_ACCOUNTS}</span></h2>
+            <p className="muted small">Run several brands or a personal and a business account from one workspace. Each account connects with its own Instagram login and has its own growth connection.</p>
+          </div>
+          <button className="btn btn-primary" disabled={state.accounts.length >= MAX_ACCOUNTS} onClick={() => setAddOpen(true)}>+ Add account</button>
+        </div>
+        <ul className="accounts-list">
+          {state.accounts.map((a) => {
+            const st = accountStatus(state, a);
+            const gr = accountGrowth(state, a);
+            const convs = state.conversations.filter((c) => (c.accountId ?? 'acc1') === a.id).length;
+            return (
+              <li key={a.id}>
+                <Avatar name={a.username.replace(/[._]/g, ' ')} color={a.color} size={44} />
+                <div className="accounts-text">
+                  <strong>@{a.username} {a.primary && <Badge tone="accent">Main</Badge>}</strong>
+                  <span className="muted small">{a.label} · {convs} conversation{convs === 1 ? '' : 's'}{a.connectedAt ? ` · since ${dateTime(a.connectedAt)}` : ''}</span>
+                </div>
+                <div className="accounts-status">
+                  {st === 'connected' ? <Badge tone="green" dot>Instagram connected</Badge> : <Badge tone="red" dot>Instagram disconnected</Badge>}
+                  {gr === 'connected' ? <Badge tone="green" dot>Growth confirmed</Badge> : gr === 'pending' ? <Badge tone="blue" dot>Growth pending</Badge> : <Badge tone="amber" dot>Growth needs action</Badge>}
+                </div>
+                {!a.primary && (
+                  <div className="row gap-sm">
+                    {st === 'connected'
+                      ? <button className="btn btn-sm btn-ghost" aria-label={`Disconnect @${a.username}`} onClick={() => setAccount(a.id, 'disconnected')}>Disconnect</button>
+                      : <button className="btn btn-sm btn-secondary" aria-label={`Reconnect @${a.username}`} onClick={() => setAccount(a.id, 'connected')}>Reconnect</button>}
+                    <button className="btn btn-sm btn-ghost" aria-label={`Remove @${a.username}`} onClick={() => removeAccount(a.id)}>Remove</button>
+                  </div>
+                )}
+                {a.primary && <span className="muted xsmall">Managed in the card above</span>}
+              </li>
+            );
+          })}
+        </ul>
+        <p className="muted xsmall">Each extra account is a separate Instagram login. Demo: extra accounts are free; pricing per account is set at launch.</p>
+      </section>
+
       <section className={`card connect-card ${state.promoview === 'connected' ? 'connected' : state.promoview === 'pending' ? '' : 'disconnected'}`} aria-labelledby="pv">
         <div className="connect-head">
           <span className="pv-logo" aria-hidden><Cpu size={24} /></span>
@@ -147,6 +232,7 @@ export default function Connect() {
         </p>
       </section>
 
+      {addOpen && <AuthModal defaultUser="" onClose={() => setAddOpen(false)} onAuthorize={addAccount} />}
       {authOpen && <AuthModal defaultUser={meta.igUsername || state.clients[0].handle.replace('@', '')} onClose={() => setAuthOpen(false)} onAuthorize={connectMeta} />}
     </>
   );
@@ -196,7 +282,7 @@ function AuthModal({ defaultUser, onClose, onAuthorize }: { defaultUser: string;
             <p className="ig-auth-note"><Lock size={13} aria-hidden /> You’re signing in on Instagram. You can remove MAGNET’s access any time in your Instagram settings.</p>
             <div className="ig-auth-actions">
               <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-              <button className="btn btn-instagram" onClick={authorize}>Authorize</button>
+              <button className="btn btn-instagram" disabled={!username.replace(/^@/, "").trim()} onClick={authorize}>Authorize</button>
             </div>
             <p className="muted xsmall center">Simulated for the demo. No real Instagram login happens and no password is entered.</p>
           </>
