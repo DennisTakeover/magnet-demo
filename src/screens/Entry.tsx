@@ -9,6 +9,8 @@ import { navigate, useStore } from '../store';
 import { money } from '../i18n/locale';
 import { MODULES, STARTER } from '../billing';
 import { PROGRAM_RATE, usd } from '../partners';
+import { BRAND, IS_PROMOVIEW } from '../brand';
+import PromoviewHome from './PromoviewHome';
 import MagnetArt from '../components/MagnetArt';
 import { EarningsCalculator } from './Partner';
 import type { ModuleId } from '../types';
@@ -27,15 +29,15 @@ export function SiteNav({ active }: { active: PublicPage | null }) {
   return (
     <header className="m-nav-wrap">
       <nav className="m-nav" aria-label="Site">
-        <a href="#/" className="m-logo" aria-label="magnet home">magnet</a>
+        <a href="#/" className="m-logo" aria-label={`${BRAND.wordmark} home`}>{BRAND.wordmark}</a>
         <div className="m-nav-links">
           <a href="#/" className={active === 'home' ? 'on' : ''}>Product</a>
           <a href="#/partners" className={active === 'partners' ? 'on' : ''}>Partners</a>
-          <a href="#/pricing" className={active === 'pricing' ? 'on' : ''}>Pricing</a>
+          <a href="#/pricing" className={active === 'pricing' ? 'on' : ''}>{IS_PROMOVIEW ? 'Prijzen' : 'Pricing'}</a>
         </div>
         <span className="m-nav-sep" aria-hidden />
-        <a className="m-nav-login" href="#/app/overview">Log in</a>
-        <a className="btn btn-dark" href="#/onboarding">Get started</a>
+        <a className="m-nav-login" href="#/app/overview">{IS_PROMOVIEW ? 'Inloggen' : 'Log in'}</a>
+        <a className="btn btn-dark" href="#/onboarding">{IS_PROMOVIEW ? 'Begin direct' : 'Get started'}</a>
       </nav>
     </header>
   );
@@ -50,7 +52,7 @@ export default function Entry({ page = 'home' }: { page?: PublicPage }) {
   return (
     <div className="m-site">
       <SiteNav active={page} />
-      {page === 'home' && <Home />}
+      {page === 'home' && (IS_PROMOVIEW ? <PromoviewHome /> : <Home />)}
       {page === 'pricing' && <Pricing />}
       {page === 'partners' && <PartnersPage />}
       <Footer />
@@ -272,14 +274,14 @@ function Home() {
  */
 export const VSL_URL = '';
 
-function VideoSection() {
+export function VideoSection({ title = 'See magnet in 2 minutes.', sub = 'From a comment on your post to a booked customer, step by step.', cta = 'Get started', demo = 'Explore the live demo', caption = 'Watch the 2-minute walkthrough' }: { title?: string; sub?: string; cta?: string; demo?: string; caption?: string }) {
   const [playing, setPlaying] = useState(false);
   return (
     <section className="m-section m-vsl" id="vsl">
       <div className="m-section-head">
         <span className="m-kicker">Watch</span>
-        <h2 className="m-h2">See magnet in 2 minutes.</h2>
-        <p className="m-sub">From a comment on your post to a booked customer, step by step.</p>
+        <h2 className="m-h2">{title}</h2>
+        <p className="m-sub">{sub}</p>
       </div>
       <div className="m-vsl-frame">
         {VSL_URL && playing ? (
@@ -288,13 +290,13 @@ function VideoSection() {
           <button className="m-vsl-poster" onClick={() => setPlaying(true)} aria-label="Play video">
             <MagnetArt className="m-vsl-magnet" size={300} rotate={-18} />
             <span className="m-vsl-play"><Play size={34} fill="currentColor" /></span>
-            <span className="m-vsl-caption">{playing && !VSL_URL ? 'Video placeholder: your sales video goes here' : 'Watch the 2-minute walkthrough'}</span>
+            <span className="m-vsl-caption">{playing && !VSL_URL ? 'Video placeholder: your sales video goes here' : caption}</span>
           </button>
         )}
       </div>
       <div className="m-ctas center-cta">
-        <a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="vsl-start">Get started <ArrowRight size={18} /></a>
-        <a className="btn btn-secondary btn-lg" href="#/app/overview" data-cta="vsl-demo">Explore the live demo</a>
+        <a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="vsl-start">{cta} <ArrowRight size={18} /></a>
+        <a className="btn btn-secondary btn-lg" href="#/app/overview" data-cta="vsl-demo">{demo}</a>
       </div>
     </section>
   );
@@ -340,7 +342,7 @@ function ReviewsSection() {
 }
 
 /** The hero product shot: a small, static rendition of the real app. */
-function ProductMock() {
+export function ProductMock() {
   const msgs = [
     ['woman-portrait', '@luciaromero', 'Love this! Do you have a guide?', '5m', true],
     ['man-glasses', '@marcoklein', 'When is the next workshop?', '12m', true],
@@ -350,7 +352,7 @@ function ProductMock() {
   return (
     <div className="m-mock" aria-hidden>
       <div className="m-mock-side">
-        <span className="m-logo sm">magnet</span>
+        <span className="m-logo sm">{BRAND.wordmark}</span>
         <span className="m-mock-nav on"><InboxIcon size={15} /> Inbox <b>12</b></span>
         <span className="m-mock-nav"><Sparkles size={15} /> AI replies</span>
         <span className="m-mock-nav"><Users size={15} /> Audience</span>
@@ -541,7 +543,7 @@ function PartnersPage() {
         </div>
         <div className="m-partner-mock" aria-hidden>
           <div className="m-mock-side">
-            <span className="m-logo sm">magnet</span>
+            <span className="m-logo sm">{BRAND.wordmark}</span>
             <span className="m-mock-nav on"><User size={15} /> Partner</span>
             <span className="m-mock-nav"><LayoutGrid size={15} /> Overview</span>
             <span className="m-mock-nav"><Link2 size={15} /> Referrals</span>
@@ -576,8 +578,9 @@ function Footer() {
     <footer className="m-footer">
       <div className="m-footer-inner">
         <div>
-          <span className="m-logo">magnet</span>
-          <p className="muted small">Grow your audience with AI. Turn conversations into opportunities.</p>
+          <span className="m-logo">{BRAND.wordmark}</span>
+          <p className="muted small">{IS_PROMOVIEW ? 'Groei je Instagram met AI. Maak van volgers klanten.' : 'Grow your audience with AI. Turn conversations into opportunities.'}</p>
+          {IS_PROMOVIEW && <p className="muted xsmall">De Nieuwe Erven 3, 5431NV Cuijk · KVK 81663285 · Btw NL004430239B63 · Tel 0685888134 · info@promo-view.nl</p>}
           <span className="m-footer-connect"><Instagram size={16} /> Connects securely via Meta · <Lock size={14} /> we never see your password</span>
         </div>
         <nav className="m-footer-cols" aria-label="Footer">

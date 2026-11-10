@@ -27,6 +27,7 @@ import Comments from './screens/Comments';
 import Billing from './screens/Billing';
 import Partner from './screens/Partner';
 import { entitledModules } from './partners';
+import { BRAND } from './brand';
 import { deniedReason, viewer } from './team';
 import LockedModule, { GATED } from './screens/LockedModule';
 import Connect from './screens/Connect';
@@ -43,7 +44,7 @@ import Analytics from './admin/Analytics';
 export function Logo({ size = 28 }: { size?: number }) {
   return (
     <span className="wordmark" style={{ fontSize: size }}>
-      MAGNET
+      {BRAND.wordmark}
     </span>
   );
 }

@@ -2,9 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ActivationKey, ActivityItem, Conversation, PersonaId, State } from './types';
 import { createSeed, clientActor } from './seed';
 import { detectLocale } from './i18n/locale';
+import { BRAND, IS_PROMOVIEW } from './brand';
 import { PERSONAS, type PersonaConfig } from './personas';
 
-const STORAGE_KEY = 'magnet-demo-state';
+const STORAGE_KEY = BRAND.storageKey;
 
 function load(): State {
   try {
@@ -19,6 +20,8 @@ function load(): State {
   // First visit: start from the visitor's detected language and currency
   const fresh = createSeed();
   fresh.locale = detectLocale();
+  // Promoview serves the Netherlands and Belgium: Dutch and euro by default
+  if (IS_PROMOVIEW) fresh.locale = { language: 'nl', currency: 'EUR', country: fresh.locale.country === 'BE' ? 'BE' : 'NL', auto: false };
   return fresh;
 }
 
