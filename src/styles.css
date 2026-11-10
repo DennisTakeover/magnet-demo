@@ -2012,3 +2012,37 @@ a.action-item:hover { background: #fff; }
   .tc-widget { right: 12px; bottom: 76px; }
   .tc-fab { width: 52px; height: 52px; }
 }
+
+/* ═════════════ Home: VSL, reviews, calculator, brand clouds ═════════════ */
+.m-home::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1100px; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(520px 260px at 6% 26%, rgba(255, 255, 255, 0.95), transparent 70%),
+    radial-gradient(640px 320px at 96% 12%, rgba(190, 220, 255, 0.9), transparent 70%),
+    radial-gradient(520px 300px at 0% 78%, rgba(200, 222, 255, 0.85), transparent 70%),
+    radial-gradient(560px 300px at 100% 80%, rgba(226, 214, 255, 0.75), transparent 70%); }
+.m-home { position: relative; }
+.m-vsl-frame { position: relative; max-width: 980px; margin: 0 auto; aspect-ratio: 16 / 9; border-radius: 36px; overflow: hidden; border: 6px solid rgba(255, 255, 255, 0.85); box-shadow: 0 40px 90px rgba(40, 50, 120, 0.22); background: #111; }
+.m-vsl-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.m-vsl-poster { position: absolute; inset: 0; width: 100%; border: 0; cursor: pointer; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(500px 300px at 20% 10%, #cfe3ff, transparent 70%), radial-gradient(500px 320px at 90% 90%, #d9ccff, transparent 70%), linear-gradient(140deg, #eef4ff, #efe9ff); }
+.m-vsl-magnet { position: absolute; right: 4%; bottom: -12%; opacity: 0.9; }
+.m-vsl-play { width: 108px; height: 108px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; padding-left: 6px; box-shadow: 0 20px 50px rgba(91, 53, 245, 0.45); transition: transform 0.15s ease; z-index: 1; }
+.m-vsl-poster:hover .m-vsl-play { transform: scale(1.06); }
+.m-vsl-caption { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; color: var(--ink); z-index: 1; }
+.tp-summary { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
+.tp-brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: #191919; }
+.tp-stars { display: inline-flex; gap: 3px; }
+.tp-star { width: 24px; height: 24px; background: #00b67a; display: inline-grid; place-items: center; }
+.tp-star.lg { width: 30px; height: 30px; }
+.tp-stars.tp-none .tp-star { background: #dcdce6; }
+.tp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tp-card { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); }
+.tp-card.placeholder { border-style: dashed; border-color: var(--line-2); background: rgba(255, 255, 255, 0.7); color: var(--muted); }
+.tp-card strong { font-size: 17px; color: var(--ink-2); }
+.tp-card p { margin: 0; }
+.tp-author { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px; }
+.tp-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--mist); display: inline-block; }
+.tp-author span span, .tp-author > span:last-child { display: flex; flex-direction: column; }
+.tp-author small { font-size: 12px; }
+.m-home .m-builder { max-width: 1080px; margin: 0 auto; }
+@media (max-width: 900px) { .tp-grid { grid-template-columns: 1fr; } .m-vsl-frame { border-radius: 24px; } .m-vsl-play { width: 76px; height: 76px; } .m-vsl-caption { font-size: 15px; bottom: 14px; } .m-vsl-magnet { width: 160px; height: 160px; } }

@@ -65,13 +65,12 @@ function Home() {
   return (
     <main className="m-home">
       <section className="m-hero">
-        <span className="m-pill"><Sparkles size={14} aria-hidden /> AI replies you approve, in your own tone</span>
         <h1 className="m-hero-title">Grow your audience<br />with AI.</h1>
         <p className="m-hero-lead">Turn conversations into opportunities.</p>
-        <p className="m-hero-sub">Reach the right people, answer every DM and turn interest into bookings and orders. All from one place.</p>
+        <p className="m-hero-sub">Your audience, conversations and next customers. Together.</p>
         <div className="m-ctas">
-          <a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="hero-start">Start free setup <ArrowRight size={18} /></a>
-          <a className="btn btn-secondary btn-lg" href="#/app/overview" data-cta="hero-demo"><Play size={16} fill="currentColor" /> Explore the demo</a>
+          <a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="hero-start">Get started</a>
+          <a className="btn btn-secondary btn-lg" href="#vsl" onClick={scrollTo('vsl')} data-cta="hero-video"><Play size={16} fill="currentColor" /> Watch demo</a>
         </div>
         <ul className="m-reassure" aria-label="Good to know">
           <li><Check size={15} aria-hidden /> Free to set up</li>
@@ -94,6 +93,8 @@ function Home() {
         <span><SlidersHorizontal size={18} aria-hidden /> Daily limits you control</span>
         <span><Layers size={18} aria-hidden /> Only pay for the modules you use</span>
       </section>
+
+      <VideoSection />
 
       <section className="m-section">
         <div className="m-section-head">
@@ -208,30 +209,16 @@ function Home() {
         </div>
       </section>
 
+      <ReviewsSection />
+
       <section className="m-section" id="pricing-preview">
         <div className="m-section-head">
           <span className="m-kicker">Pricing</span>
-          <h2 className="m-h2">Simple plans. Change any time.</h2>
-          <p className="m-sub">Start small and add modules when you need them. Prices in {state.locale.currency}.</p>
+          <h2 className="m-h2">Build your own subscription.</h2>
+          <p className="m-sub">Switch modules on or off and see your price right away. Change it any time. Prices in {state.locale.currency}.</p>
         </div>
-        <div className="m-plans">
-          <article className="m-plan">
-            <span className="m-plan-name">Starter</span>
-            <span className="m-plan-price">{money(97)}<small>/month</small></span>
-            <p className="muted">Grow your audience and never miss a DM.</p>
-            <ul className="m-checks"><li><Check size={16} /> Grow</li><li><Check size={16} /> AI Inbox</li><li><Check size={16} /> Leads, overview and support</li></ul>
-            <a className="btn btn-secondary btn-block btn-lg" href="#/onboarding" data-cta="plan-starter">Start with Starter</a>
-          </article>
-          <article className="m-plan featured">
-            <span className="m-plan-tag">Most complete</span>
-            <span className="m-plan-name">Growth</span>
-            <span className="m-plan-price">{money(297)}<small>/month</small></span>
-            <p>Everything to turn followers into customers.</p>
-            <ul className="m-checks"><li><Check size={16} /> Everything in Starter</li><li><Check size={16} /> Lead Flows and Comments</li><li><Check size={16} /> Planner with linked flows</li></ul>
-            <a className="btn btn-primary btn-block btn-lg" href="#/onboarding" data-cta="plan-growth">Start with Growth</a>
-          </article>
-        </div>
-        <p className="m-plan-more"><a href="#/pricing">Build your own plan from modules <ArrowRight size={14} /></a> · <a href="#/app/dfy">Prefer we run it for you?</a></p>
+        <PlanBuilder />
+        <p className="m-plan-more"><a href="#/app/dfy">Prefer we run it for you? See Done for you <ArrowRight size={14} /></a></p>
       </section>
 
       <section className="m-section lfaq" id="faq">
@@ -276,6 +263,79 @@ function Home() {
         <a className="btn btn-primary" href="#/onboarding" data-cta="sticky-start">Start free</a>
       </div>
     </main>
+  );
+}
+
+/**
+ * Video sales letter slot. Set VSL_URL to an embeddable video link (YouTube, Vimeo, Wistia)
+ * and the placeholder becomes the real player.
+ */
+export const VSL_URL = '';
+
+function VideoSection() {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <section className="m-section m-vsl" id="vsl">
+      <div className="m-section-head">
+        <span className="m-kicker">Watch</span>
+        <h2 className="m-h2">See magnet in 2 minutes.</h2>
+        <p className="m-sub">From a comment on your post to a booked customer, step by step.</p>
+      </div>
+      <div className="m-vsl-frame">
+        {VSL_URL && playing ? (
+          <iframe src={VSL_URL} title="magnet video" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
+        ) : (
+          <button className="m-vsl-poster" onClick={() => setPlaying(true)} aria-label="Play video">
+            <MagnetArt className="m-vsl-magnet" size={300} rotate={-18} />
+            <span className="m-vsl-play"><Play size={34} fill="currentColor" /></span>
+            <span className="m-vsl-caption">{playing && !VSL_URL ? 'Video placeholder: your sales video goes here' : 'Watch the 2-minute walkthrough'}</span>
+          </button>
+        )}
+      </div>
+      <div className="m-ctas center-cta">
+        <a className="btn btn-primary btn-lg" href="#/onboarding" data-cta="vsl-start">Get started <ArrowRight size={18} /></a>
+        <a className="btn btn-secondary btn-lg" href="#/app/overview" data-cta="vsl-demo">Explore the live demo</a>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Review slots in Trustpilot's visual style. These are empty placeholders: real reviews and the
+ * real score come from the official Trustpilot widget once the business profile exists.
+ */
+function Stars({ empty }: { empty?: boolean }) {
+  return (
+    <span className={`tp-stars ${empty ? 'tp-none' : ''}`} aria-hidden>
+      {[0, 1, 2, 3, 4].map((i) => <span key={i} className="tp-star"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="#fff" d="M12 2.5l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.7l7.1-.6z" /></svg></span>)}
+    </span>
+  );
+}
+
+function ReviewsSection() {
+  return (
+    <section className="m-section m-reviews" id="reviews">
+      <div className="m-section-head">
+        <span className="m-kicker">Reviews</span>
+        <h2 className="m-h2">What customers say.</h2>
+      </div>
+      <div className="tp-summary">
+        <span className="tp-brand"><span className="tp-star lg"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="#fff" d="M12 2.5l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.7l7.1-.6z" /></svg></span> Trustpilot</span>
+        <Stars empty />
+        <span className="muted">Score and review count appear here once the Trustpilot widget is connected.</span>
+      </div>
+      <div className="tp-grid">
+        {['Coach', 'Webshop', 'Local shop'].map((who) => (
+          <article key={who} className="tp-card placeholder">
+            <Stars empty />
+            <strong>Review title</strong>
+            <p>A real customer review will be shown here, pulled from Trustpilot.</p>
+            <span className="tp-author"><span className="tp-avatar" aria-hidden /> <span><b>Customer name</b><small>{who} · verified review</small></span></span>
+          </article>
+        ))}
+      </div>
+      <p className="m-demo-row">Placeholder. No reviews are shown until real, verified ones exist.</p>
+    </section>
   );
 }
 
@@ -339,7 +399,8 @@ const MOD_TAG: Record<ModuleId, string> = {
   planner: 'Plan posts that feed your Lead Flows.',
 };
 
-function Pricing() {
+/** Price calculator: toggle modules and see the monthly total. Used on the home and pricing pages. */
+export function PlanBuilder() {
   const [sel, setSel] = useState<ModuleId[]>(['core', 'grow', 'inbox', 'flows']);
   const toggle = (m: ModuleId, on: boolean) => {
     let next = on ? [...sel, m] : sel.filter((x) => x !== m);
@@ -350,6 +411,46 @@ function Pricing() {
   const total = MODULES.filter((m) => sel.includes(m.id)).reduce((t, m) => t + m.priceUsd, 0);
   const preset = (mods: ModuleId[]) => setSel(mods);
   return (
+    <div className="m-builder">
+      <div className="m-builder-list" role="group" aria-label="Modules">
+        {MODULES.map((m) => {
+          const I = MOD_ICON[m.id];
+          const on = sel.includes(m.id);
+          return (
+            <label key={m.id} className={`m-mod ${on ? 'on' : ''}`}>
+              <span className="m-icon"><I size={20} aria-hidden /></span>
+              <span className="m-mod-text"><strong>{m.name}</strong><span>{MOD_TAG[m.id]}{m.requires ? ` Needs ${MODULES.find((x) => x.id === m.requires![0])!.name}.` : ''}</span></span>
+              <span className="m-mod-price">{money(m.priceUsd)}<small>/mo</small></span>
+              <input type="checkbox" role="switch" className="switch" checked={on} disabled={m.locked} onChange={(e) => toggle(m.id, e.target.checked)} aria-label={m.name} />
+            </label>
+          );
+        })}
+      </div>
+      <aside className="m-selection" aria-live="polite">
+        <h2>Your selection</h2>
+        <ul>
+          {MODULES.filter((m) => sel.includes(m.id)).map((m) => {
+            const I = MOD_ICON[m.id];
+            return <li key={m.id}><span className="m-icon sm"><I size={16} aria-hidden /></span>{m.name}</li>;
+          })}
+        </ul>
+        <div className="m-total">
+          <span>Per month</span>
+          <strong data-testid="plan-total">{money(total)}</strong>
+          <small>No bundle discount, so removing a module always saves money.</small>
+        </div>
+        <div className="m-presets">
+          <button className="btn btn-sm btn-secondary" onClick={() => preset([...STARTER])}>Starter · {money(97)}</button>
+          <button className="btn btn-sm btn-secondary" onClick={() => preset(MODULES.map((m) => m.id))}>Everything · {money(297)}</button>
+        </div>
+        <a className="btn btn-primary btn-lg btn-block" href="#/onboarding">Start with this setup <ArrowRight size={18} /></a>
+      </aside>
+    </div>
+  );
+}
+
+function Pricing() {
+  return (
     <main>
       <section className="m-hero m-hero-tight">
         <h1 className="m-hero-title">Your business. Your setup.</h1>
@@ -359,41 +460,7 @@ function Pricing() {
       <section className="m-builder-wrap">
         <img className="m-photo m-photo-c" src={img('woman-sweater')} alt="" />
         <MagnetArt className="m-corner-magnet" size={130} rotate={-30} />
-        <div className="m-builder">
-          <div className="m-builder-list" role="group" aria-label="Modules">
-            {MODULES.map((m) => {
-              const I = MOD_ICON[m.id];
-              const on = sel.includes(m.id);
-              return (
-                <label key={m.id} className={`m-mod ${on ? 'on' : ''}`}>
-                  <span className="m-icon"><I size={20} aria-hidden /></span>
-                  <span className="m-mod-text"><strong>{m.name}</strong><span>{MOD_TAG[m.id]}{m.requires ? ` Needs ${MODULES.find((x) => x.id === m.requires![0])!.name}.` : ''}</span></span>
-                  <span className="m-mod-price">{money(m.priceUsd)}<small>/mo</small></span>
-                  <input type="checkbox" role="switch" className="switch" checked={on} disabled={m.locked} onChange={(e) => toggle(m.id, e.target.checked)} aria-label={m.name} />
-                </label>
-              );
-            })}
-          </div>
-          <aside className="m-selection" aria-live="polite">
-            <h2>Your selection</h2>
-            <ul>
-              {MODULES.filter((m) => sel.includes(m.id)).map((m) => {
-                const I = MOD_ICON[m.id];
-                return <li key={m.id}><span className="m-icon sm"><I size={16} aria-hidden /></span>{m.name}</li>;
-              })}
-            </ul>
-            <div className="m-total">
-              <span>Per month</span>
-              <strong data-testid="plan-total">{money(total)}</strong>
-              <small>No bundle discount, so removing a module always saves money.</small>
-            </div>
-            <div className="m-presets">
-              <button className="btn btn-sm btn-secondary" onClick={() => preset([...STARTER])}>Starter · {money(97)}</button>
-              <button className="btn btn-sm btn-secondary" onClick={() => preset(MODULES.map((m) => m.id))}>Everything · {money(297)}</button>
-            </div>
-            <a className="btn btn-primary btn-lg btn-block" href="#/onboarding">Start with this setup <ArrowRight size={18} /></a>
-          </aside>
-        </div>
+        <PlanBuilder />
       </section>
       <section className="m-section m-tiles">
         {[
