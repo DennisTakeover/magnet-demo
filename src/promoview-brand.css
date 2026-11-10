@@ -134,3 +134,4 @@ html[data-brand=promoview], [data-brand=promoview] body {
 [data-brand=promoview] a.nav-link, [data-brand=promoview] .m-nav-links a, [data-brand=promoview] a.m-nav-login, [data-brand=promoview] .m-footer-cols a { color: var(--ink-2); }
 [data-brand=promoview] a.btn-secondary { color: var(--accent); }
 [data-brand=promoview] a.btn-ghost { color: var(--ink-2); }
+[data-brand=promoview] a.tp-card { color: var(--ink); }

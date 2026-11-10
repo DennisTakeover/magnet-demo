@@ -1,6 +1,8 @@
 import { ArrowRight, Check, ChevronRight, Instagram, Lock, MessageCircle, Play, ShieldCheck, Sparkles, Target, Users, X } from 'lucide-react';
 import MagnetArt from '../components/MagnetArt';
+import { useState } from 'react';
 import { PlanBuilder, ProductMock, VideoSection, img } from './Entry';
+import { PV_REVIEWS } from './promoviewReviews';
 
 const scrollTo = (id: string) => (e: React.MouseEvent) => {
   e.preventDefault();
@@ -8,19 +10,6 @@ const scrollTo = (id: string) => (e: React.MouseEvent) => {
 };
 
 export const TRUSTPILOT_URL = 'https://nl.trustpilot.com/review/promo-view.io';
-
-/** Real customer reviews, quoted verbatim from promo-view.io (collected there under "Trustpilot Reviews"). */
-export const PV_REVIEWS: { name: string; text: string }[] = [
-  { name: 'Afservices.io', text: 'Promoview is een totale game-changer voor mijn Instagram. Van 1200 naar 4500 volgers in 4 maanden. Mijn posts krijgen nu veel meer engagement als voorheen. Ook hebben wij er maandelijks veel leads en klanten uitgehaald.' },
-  { name: 'Noviofit.pt', text: 'Voor mijn fitnessclub had ik meer publiek nodig. Door Promoview zijn we van 850 naar 3200 volgers gegaan in een tijdsbestek van 3 maanden. Ik heb hier tientallen nieuwe klanten uitgehaald. Zeker een aanrader.' },
-  { name: 'lureparts.nl', text: 'Prima ervaring met Promoview. Was eerst wat sceptisch, maar het heeft nu wel echt toegevoegde waarde. In een maand tijd plusminus 700 volgers erbij. En geen bots, maar veel potentiele klanten, waarvan er een aantal reeds hebben besteld in mijn webshop. Communicatie met promoview is ook goed. Kortom tevreden.' },
-  { name: 'Jordy.schilten', text: 'Mijn broer en ik geven bol.com cursussen en zochten naar nieuwe studenten. Op het begin was ik skeptisch, maar wat een wereld van verschil heeft Promoview weten te brengen. Meer dan 850 kwalitatieve volgers gestegen in 1,5 maand, en een een aantal nieuwe studenten.' },
-  { name: 'Byroyalsinteriors', text: 'Het team heeft de beloften die ze vooraf hebben gedaan, nagekomen. De communicatie is helder en bij vragen krijg je binnen 24 uur een reactie. Daarnaast streven ze ernaar om elke maand te verbeteren en betrekken ze je bij dit proces. De maandelijkse groei is zichtbaar en dit is top!' },
-  { name: 'Alleskidsindrenthe', text: 'Echt helemaal te gek!! Was eerst best wel sceptisch maar nu 3 weken onderweg en heel stabiel groeien per week de volgers. Geen gekke profielen met plaatjes van een poes of kip als profielfoto, echte volgers die matchen met het profiel wat we als volgers zouden willen. Complimenten voor het team van promoview en zeker een aanrader om de hulp van in te schakelen' },
-  { name: 'Danielschotman', text: 'Betrouwbare partij, in 3 maanden tijd erg veel volgers bijgekregen waarvan sommige klant zijn geworden binnen mijn bedrijf! Zeker een aanrader!' },
-  { name: 'Rachel_spier', text: 'Ik heb een maandje Promoview afgenomen. De samenwerking met Promoview heb ik als super goed ervaren. Kundigheid en expertise maakte onze samenwerking tot een succes. Mijn volgers gingen van 120 naar 402 na 1 maand.' },
-  { name: 'N1gloves', text: 'Benaderd door de mannen van Promoview en ik kan niks anders zeggen dan dat ik het iedereen aanraad, hoge kwalitatieve volgers erbij gekregen die daardoor weer tot conversie leiden. Al met al, super tevreden over het werk van Promoview' },
-];
 
 /** Case results as published on promo-view.io. */
 const CASES = [
@@ -32,6 +21,36 @@ const CASES = [
 
 function TpStar({ lg }: { lg?: boolean }) {
   return <span className={`tp-star ${lg ? 'lg' : ''}`} aria-hidden><svg viewBox="0 0 24 24" width={lg ? 22 : 16} height={lg ? 22 : 16}><path fill="#fff" d="M12 2.5l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.7l7.1-.6z" /></svg></span>;
+}
+
+function ReviewsBlock() {
+  const [all, setAll] = useState(false);
+  const shown = all ? PV_REVIEWS : PV_REVIEWS.slice(0, 9);
+  return (
+    <section className="m-section m-reviews" id="reviews">
+      <div className="m-section-head">
+        <span className="m-kicker">Reviews</span>
+        <h2 className="m-h2">Wat klanten zeggen.</h2>
+      </div>
+      <div className="tp-summary">
+        <span className="tp-brand"><TpStar lg /> Trustpilot</span>
+        <span className="muted">{PV_REVIEWS.length} reviews van klanten</span>
+        <a className="btn btn-secondary" href={TRUSTPILOT_URL} target="_blank" rel="noreferrer">Bekijk op Trustpilot <ArrowRight size={16} /></a>
+      </div>
+      <div className="tp-grid">
+        {shown.map((r) => (
+          <a key={r.name} className="tp-card" href={TRUSTPILOT_URL} target="_blank" rel="noreferrer" aria-label={`Review van ${r.name}, ${r.stars} van 5 sterren. Open op Trustpilot`}>
+            <span className="tp-author">
+              <img className="tp-logo" src={r.logo} alt="" />
+              <span><b>{r.name}</b><span className="tp-stars" aria-hidden>{Array.from({ length: r.stars }, (_, i) => <TpStar key={i} />)}</span></span>
+            </span>
+            <p>{r.text}</p>
+          </a>
+        ))}
+      </div>
+      {!all && <div className="m-ctas center-cta"><button className="btn btn-secondary btn-lg" onClick={() => setAll(true)}>Toon alle {PV_REVIEWS.length} reviews</button></div>}
+    </section>
+  );
 }
 
 export default function PromoviewHome() {
@@ -129,24 +148,7 @@ export default function PromoviewHome() {
         </table>
       </section>
 
-      <section className="m-section m-reviews" id="reviews">
-        <div className="m-section-head">
-          <span className="m-kicker">Reviews</span>
-          <h2 className="m-h2">Wat klanten zeggen.</h2>
-        </div>
-        <div className="tp-summary">
-          <span className="tp-brand"><TpStar lg /> Trustpilot</span>
-          <a className="btn btn-secondary" href={TRUSTPILOT_URL} target="_blank" rel="noreferrer">Lees alle reviews op Trustpilot <ArrowRight size={16} /></a>
-        </div>
-        <div className="tp-grid">
-          {PV_REVIEWS.map((r) => (
-            <article key={r.name} className="tp-card">
-              <p>{r.text}</p>
-              <span className="tp-author"><span className="tp-avatar" aria-hidden>{r.name[0].toUpperCase()}</span> <span><b>{r.name}</b><small>Klant van Promoview</small></span></span>
-            </article>
-          ))}
-        </div>
-      </section>
+      <ReviewsBlock />
 
       <section className="m-section" id="pricing-preview">
         <div className="m-section-head">

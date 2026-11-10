@@ -2067,3 +2067,11 @@ a.action-item:hover { background: #fff; }
 .tp-card:not(.placeholder) p { color: var(--ink); font-size: 15px; }
 @media (max-width: 1000px) { .pv-cases { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .pv-cases { grid-template-columns: 1fr; } }
+a.tp-card { text-decoration: none !important; color: inherit; transition: transform 0.15s ease; }
+a.tp-card:hover { transform: translateY(-2px); }
+a.tp-card .tp-author { margin: 0; padding: 0; align-items: center; }
+.tp-logo { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; flex: none; background: var(--mist); }
+a.tp-card .tp-author > span { gap: 4px; }
+a.tp-card .tp-stars .tp-star { width: 18px; height: 18px; }
+a.tp-card .tp-stars .tp-star svg { width: 12px; height: 12px; }
+a.tp-card .tp-author .tp-stars { display: inline-flex; flex-direction: row; gap: 2px; }
