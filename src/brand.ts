@@ -1,6 +1,6 @@
 /**
  * Two brands, one codebase. MAGNET is the international brand; Promoview serves the
- * Netherlands and Belgium. The brand follows the hostname (any host containing "promo"),
+ * Netherlands and Belgium. The brand follows the hostname (hosts starting with "promoview" or "promo-view"),
  * and `?brand=promoview` / `?brand=magnet` overrides it for previews.
  */
 export type BrandId = 'magnet' | 'promoview';
@@ -17,7 +17,8 @@ function detect(): BrandId {
   } catch {
     /* storage unavailable */
   }
-  return /promo/i.test(window.location.hostname) ? 'promoview' : 'magnet';
+  // Match on how the hostname starts: MAGNET preview URLs end in the team slug "-promoview"
+  return /^(www\.)?promo-?view/i.test(window.location.hostname) ? 'promoview' : 'magnet';
 }
 
 export const BRAND_ID: BrandId = detect();
