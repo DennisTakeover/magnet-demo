@@ -149,8 +149,14 @@ export function simulateRenewal(d: State): string {
     b.discount.months -= 1;
     if (b.discount.months <= 0) b.discount = null;
   }
+  const firstCharge = !!b.trialEnd;
+  b.trialEnd = null;
   b.invoices.unshift({ id: `INV-${1000 + b.invoices.length + 1}`, date, amountUsd: payableUsd(d), status: 'paid', modules: [...b.modules] });
   b.periodEnd = addMonths(date, 1);
+  if (firstCharge) {
+    logActivity(d, { actor: 'System', actorRole: 'system', clientId: 'c1', type: 'setting', action: 'Trial ended: first payment collected', result: 'success' });
+    return 'Trial ended. Your first payment went through and your subscription is active.';
+  }
   logActivity(d, { actor: 'System', actorRole: 'system', clientId: 'c1', type: 'setting', action: `Subscription renewed (${b.modules.length} modules)`, result: 'success' });
   return 'Renewed. Any scheduled change is now active.';
 }

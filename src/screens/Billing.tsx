@@ -29,6 +29,8 @@ function BillingHome() {
   const [invoice, setInvoice] = useState<string | null>(null);
   const [reactivate, setReactivate] = useState(false);
   const [st, tone] = STATUS[b.status];
+  // Whole calendar days until the trial ends
+  const trialLeft = b.trialEnd ? Math.max(0, Math.round((new Date(`${b.trialEnd}T00:00:00`).getTime() - new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00`).getTime()) / 86_400_000)) : 0;
   const inv = b.invoices.find((i) => i.id === invoice);
 
   const undoScheduled = () => {
@@ -59,6 +61,18 @@ function BillingHome() {
   return (
     <>
       <PageHeader title="Billing" subtitle="Your modules, invoices and subscription. Change or cancel any time, right here." />
+
+      {b.trialEnd && b.status !== 'ended' && (
+        <div className="banner trial-banner" role="status">
+          <Clock size={18} aria-hidden />
+          <span>
+            <strong>Free trial: {trialLeft} day{trialLeft === 1 ? '' : 's'} left.</strong>{' '}
+            {b.status === 'cancellation_scheduled'
+              ? `You cancelled, so nothing will be charged. Access ends on ${formatDate(b.trialEnd)}.`
+              : `Nothing has been charged. Your first payment of ${money(payableUsd(state))} is on ${formatDate(b.trialEnd)}. Cancel before then and you pay nothing.`}
+          </span>
+        </div>
+      )}
 
       {b.pending && (
         <div className="banner banner-amber" role="status">
@@ -100,7 +114,7 @@ function BillingHome() {
         <section className="card bl-plan" aria-labelledby="plan">
           <div className="card-head">
             <h2 id="plan">Your subscription</h2>
-            <Badge tone={tone} dot>{st}</Badge>
+            {b.trialEnd && b.status === 'active' ? <Badge tone="blue" dot>Free trial</Badge> : <Badge tone={tone} dot>{st}</Badge>}
           </div>
 
           <ul className="bl-modules">
@@ -160,6 +174,7 @@ function BillingHome() {
 
           <section className="card" aria-labelledby="inv">
             <h2 id="inv">Invoices</h2>
+            {b.invoices.length === 0 && <p className="muted small">No invoices yet.{b.trialEnd ? ` Your first invoice follows when the trial ends on ${formatDate(b.trialEnd)}.` : ''}</p>}
             <ul className="bl-invoices">
               {b.invoices.map((i) => (
                 <li key={i.id}>

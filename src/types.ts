@@ -327,6 +327,8 @@ export interface BillingState {
   scheduled: { modules: ModuleId[]; effective: string } | null;
   discount: { percent: number; months: number; until: string; offerVersion?: number } | null;
   pauseUntil: string | null;
+  /** End of the free trial (yyyy-mm-dd). While set, nothing has been charged yet. */
+  trialEnd?: string | null;
   /** Change waiting for the billing provider (shown as Pending processing) */
   pending: { label: string; requestedAt: number; apply: 'cancel' | 'modules' | 'pause' | 'discount'; modules?: ModuleId[]; months?: number; percent?: number } | null;
   usedDiscount: boolean;

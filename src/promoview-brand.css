@@ -135,3 +135,44 @@ html[data-brand=promoview], [data-brand=promoview] body {
 [data-brand=promoview] a.btn-secondary { color: var(--accent); }
 [data-brand=promoview] a.btn-ghost { color: var(--ink-2); }
 [data-brand=promoview] a.tp-card { color: var(--ink); }
+
+/* ───────── Promoview landing: motion ───────── */
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero entrance, staggered */
+  .pv-home .m-hero > .m-pill, .pv-home .m-hero > .m-hero-title, .pv-home .m-hero > .m-hero-lead, .pv-home .m-hero > .m-hero-sub,
+  .pv-home .m-hero > .m-ctas, .pv-home .m-hero > .m-reassure, .pv-home .m-hero > .m-hero-stage { animation: pv-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .pv-home .m-hero > .m-hero-title { animation-delay: 0.08s; }
+  .pv-home .m-hero > .m-hero-lead { animation-delay: 0.16s; }
+  .pv-home .m-hero > .m-hero-sub { animation-delay: 0.22s; }
+  .pv-home .m-hero > .m-ctas { animation-delay: 0.3s; }
+  .pv-home .m-hero > .m-reassure { animation-delay: 0.38s; }
+  .pv-home .m-hero > .m-hero-stage { animation-delay: 0.46s; animation-duration: 0.9s; }
+  @keyframes pv-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+  /* Gradient text slowly shifts */
+  [data-brand=promoview] .pv-home .pv-grad { background-size: 220% 100%; animation: pv-shift 6s ease-in-out infinite alternate; }
+  @keyframes pv-shift { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+
+  /* Product shot: soft float with a breathing pink glow */
+  .pv-home .m-hero-stage::before { content: ''; position: absolute; inset: 8% 12% -6%; background: radial-gradient(closest-side, rgba(248, 54, 109, 0.35), transparent 70%); filter: blur(40px); z-index: 0; animation: pv-glow 5s ease-in-out infinite alternate; pointer-events: none; }
+  .pv-home .m-mock { animation: pv-float 7s ease-in-out infinite; }
+  @keyframes pv-glow { from { opacity: 0.45; transform: scale(0.96); } to { opacity: 0.95; transform: scale(1.04); } }
+  @keyframes pv-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  /* Scroll reveal */
+  .pv-anim .rv { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms); }
+  .pv-anim .rv.in { opacity: 1; transform: none; }
+
+  /* Hover and attention */
+  .pv-home .btn-primary { transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.15s ease; }
+  .pv-home .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(248, 54, 109, 0.4); }
+  .pv-home .pv-case, .pv-home .tp-card.in { transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms); }
+  .pv-home .pv-case:hover, .pv-home a.tp-card:hover { transform: translateY(-4px); border-color: rgba(248, 54, 109, 0.5); }
+  .pv-home .m-vsl-play { animation: pv-pulse 2.4s ease-out infinite; }
+  @keyframes pv-pulse { 0% { box-shadow: 0 0 0 0 rgba(248, 54, 109, 0.55); } 70%, 100% { box-shadow: 0 0 0 26px rgba(248, 54, 109, 0); } }
+  .pv-home .m-pill svg { animation: pv-spark 2.6s ease-in-out infinite; }
+  @keyframes pv-spark { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(1.25) rotate(12deg); opacity: 0.7; } }
+  .pv-home .lfaq-item[open] p { animation: pv-up 0.35s ease both; }
+  .pv-home .tp-star { transition: transform 0.2s ease; }
+  .pv-home a.tp-card:hover .tp-star { transform: scale(1.12); }
+}

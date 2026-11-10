@@ -2,6 +2,7 @@ import type { ActivityItem, AdminClient, Execution, PersonaId, State } from './t
 import { PERSONAS, PERSONA_ORDER, PERSONA_SEEDS } from './personas';
 import type { SeedHelpers } from './personas/types';
 import { seedPartners } from './partnerSeed';
+import { TRIAL_DAYS } from './brand';
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
@@ -134,6 +135,7 @@ export function createSeed(persona: PersonaId = 'coach'): State {
         { id: 'INV-1001', date: isoDate(-72), amountUsd: 97, status: 'paid', modules: ['core', 'grow', 'inbox'] },
       ],
       sessions: [],
+      ...(TRIAL_DAYS ? { trialEnd: isoDate(TRIAL_DAYS - 3), periodEnd: isoDate(TRIAL_DAYS - 3), invoices: [] } : {}),
     },
     dfyBookings: [],
     partners: seedPartners(clients, { ago, isoDate, DAY, HOUR }),

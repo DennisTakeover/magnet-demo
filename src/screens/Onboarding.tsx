@@ -3,6 +3,8 @@ import {
   ArrowLeft, ArrowRight, Briefcase, Check, Cpu, Instagram, Lock, Mail, MessageCircle, Pencil, RefreshCw, ShoppingBag, Store, Target, TrendingUp, Users, CalendarDays, X,
 } from 'lucide-react';
 import { clientLog, logActivity, markActivation, navigate, useStore } from '../store';
+import { TRIAL_DAYS } from '../brand';
+import { addDays } from '../billing';
 import { SiteNav, img } from './Entry';
 import MagnetArt from '../components/MagnetArt';
 import { createSeed } from '../seed';
@@ -128,6 +130,7 @@ export default function Onboarding() {
     toast('Workspace created. In the demo no email is sent.', 'success');
   };
 
+  const trialEndDate = addDays(new Date().toISOString().slice(0, 10), TRIAL_DAYS);
   const pay = () => {
     if (paying !== 'idle' || deps.length) return;
     setPaying('confirming');
@@ -151,8 +154,9 @@ export default function Onboarding() {
       d.campaign = 'draft';
       d.clients[0].campaign = 'draft';
       d.billing.modules = [...mods];
-      d.billing.periodEnd = renewDate;
-      d.billing.invoices = [{ id: 'INV-1001', date: new Date().toISOString().slice(0, 10), amountUsd: totalUsd(mods), status: 'paid', modules: [...mods] }];
+      d.billing.periodEnd = TRIAL_DAYS ? trialEndDate : renewDate;
+      d.billing.trialEnd = TRIAL_DAYS ? trialEndDate : null;
+      d.billing.invoices = TRIAL_DAYS ? [] : [{ id: 'INV-1001', date: new Date().toISOString().slice(0, 10), amountUsd: totalUsd(mods), status: 'paid', modules: [...mods] }];
       d.activation = { goal, done: {}, dismissed: false, startedAt: Date.now(), firstValueAt: null, onboardingStep: 0, draft: undefined };
       if (meta === 'connected') markActivation(d, 'connect_meta');
       if (growth === 'connected') markActivation(d, 'connect_growth');
@@ -413,12 +417,13 @@ export default function Onboarding() {
               {deps.map((x) => <p key={x.module} className="field-error">{moduleName(x.module)} needs {moduleName(x.needs)}.</p>)}
               <dl className="summary-list onb-summary">
                 <dt>Total</dt><dd><strong>{money(totalUsd(mods))}</strong> per month, excluding tax</dd>
-                <dt>Billing</dt><dd>Monthly in {state.locale.currency}. Renews on {formatDate(renewDate)}.</dd>
+                {TRIAL_DAYS > 0 && <><dt>Free trial</dt><dd><strong>{TRIAL_DAYS} days free.</strong> Nothing is charged today.</dd></>}
+                <dt>Billing</dt><dd>{TRIAL_DAYS ? `First payment on ${formatDate(trialEndDate)}, then monthly in ${state.locale.currency}. Cancel before that date and you pay nothing.` : `Monthly in ${state.locale.currency}. Renews on ${formatDate(renewDate)}.`}</dd>
                 <dt>Cancel</dt><dd>Any time in Billing, no call needed.</dd>
               </dl>
-              {paying === 'idle' && <button className="btn btn-primary" disabled={deps.length > 0} onClick={pay}>Start subscription · {money(totalUsd(mods))}/mo</button>}
-              {paying === 'confirming' && <p className="onb-ok"><RefreshCw size={16} className="spin" aria-hidden /> Confirming payment with the billing provider…</p>}
-              {paying === 'paid' && <p className="onb-ok"><Check size={16} aria-hidden /> Payment confirmed (demo). Your modules are ready.</p>}
+              {paying === 'idle' && <button className="btn btn-primary" disabled={deps.length > 0} onClick={pay}>{TRIAL_DAYS ? `Start ${TRIAL_DAYS}-day free trial` : `Start subscription · ${money(totalUsd(mods))}/mo`}</button>}
+              {paying === 'confirming' && <p className="onb-ok"><RefreshCw size={16} className="spin" aria-hidden /> {TRIAL_DAYS ? 'Starting your trial…' : 'Confirming payment with the billing provider…'}</p>}
+              {paying === 'paid' && <p className="onb-ok"><Check size={16} aria-hidden /> {TRIAL_DAYS ? `Trial started (demo). Your modules are ready for ${TRIAL_DAYS} days, free.` : 'Payment confirmed (demo). Your modules are ready.'}</p>}
               <p className="muted xsmall">Demo: no card details are asked and nothing is charged.</p>
             </>
           )}

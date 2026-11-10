@@ -9,7 +9,7 @@ import { navigate, useStore } from '../store';
 import { money } from '../i18n/locale';
 import { MODULES, STARTER } from '../billing';
 import { PROGRAM_RATE, usd } from '../partners';
-import { BRAND, IS_PROMOVIEW } from '../brand';
+import { BRAND, IS_PROMOVIEW, TRIAL_DAYS } from '../brand';
 import PromoviewHome from './PromoviewHome';
 import MagnetArt from '../components/MagnetArt';
 import { EarningsCalculator } from './Partner';
@@ -445,7 +445,8 @@ export function PlanBuilder() {
           <button className="btn btn-sm btn-secondary" onClick={() => preset([...STARTER])}>Starter · {money(97)}</button>
           <button className="btn btn-sm btn-secondary" onClick={() => preset(MODULES.map((m) => m.id))}>Everything · {money(297)}</button>
         </div>
-        <a className="btn btn-primary btn-lg btn-block" href="#/onboarding">Start with this setup <ArrowRight size={18} /></a>
+        <a className="btn btn-primary btn-lg btn-block" href="#/onboarding">{TRIAL_DAYS ? `Start ${TRIAL_DAYS} dagen gratis` : 'Start with this setup'} <ArrowRight size={18} /></a>
+            {TRIAL_DAYS > 0 && <small className="m-trial-note">Eerste betaling pas na {TRIAL_DAYS} dagen. Binnen die tijd opzeggen kost niets.</small>}
       </aside>
     </div>
   );

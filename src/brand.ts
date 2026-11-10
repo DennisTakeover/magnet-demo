@@ -24,6 +24,9 @@ function detect(): BrandId {
 export const BRAND_ID: BrandId = detect();
 export const IS_PROMOVIEW = BRAND_ID === 'promoview';
 
+/** Free trial length in days. Promoview starts with a 10-day trial; MAGNET has none. */
+export const TRIAL_DAYS = IS_PROMOVIEW ? 10 : 0;
+
 export const BRAND = IS_PROMOVIEW
   ? { id: BRAND_ID, name: 'Promoview', wordmark: 'Promoview', title: 'Promoview · Instagram-groei met AI', storageKey: 'promoview-demo-state' }
   : { id: BRAND_ID, name: 'MAGNET', wordmark: 'magnet', title: 'MAGNET Demo', storageKey: 'magnet-demo-state' };

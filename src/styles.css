@@ -2075,3 +2075,5 @@ a.tp-card .tp-author > span { gap: 4px; }
 a.tp-card .tp-stars .tp-star { width: 18px; height: 18px; }
 a.tp-card .tp-stars .tp-star svg { width: 12px; height: 12px; }
 a.tp-card .tp-author .tp-stars { display: inline-flex; flex-direction: row; gap: 2px; }
+.trial-banner { background: linear-gradient(120deg, var(--accent-soft), var(--blue-soft)); color: var(--ink); border: 1px solid var(--accent-soft-2); }
+.m-trial-note { color: var(--ink-2); text-align: center; }
