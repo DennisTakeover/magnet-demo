@@ -3,10 +3,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, CalendarClock, Check, Clock, Cred
 import { clientLog, logActivity, navigate, uid, useStore } from '../store';
 import { money } from '../i18n/locale';
 import { Badge, Modal, PageHeader, formatDate } from '../components/ui';
-import {
-  ALL_MODULES, MODULES, REASONS, STARTER, addMonths, applyChange, commitChange, missingDependencies, moduleName, offerFor, payableUsd, publishedOffer, quote, redeemOffer,
-  simulateRenewal, totalUsd, type Quote,
-} from '../billing';
+import { ALL_MODULES, REASONS, STARTER, addMonths, applyChange, commitChange, missingDependencies, moduleName, offerFor, payableUsd, publishedOffer, quote, redeemOffer, simulateRenewal, totalUsd, type Quote, LISTED, namesOf } from '../billing';
 import type { CancelReason, ModuleId, OffboardingSession, State, SubscriptionStatus } from '../types';
 
 const STATUS: Record<SubscriptionStatus, [string, 'green' | 'amber' | 'red' | 'blue' | 'neutral']> = {
@@ -118,7 +115,7 @@ function BillingHome() {
           </div>
 
           <ul className="bl-modules">
-            {MODULES.filter((m) => b.modules.includes(m.id)).map((m) => (
+            {LISTED.filter((m) => b.modules.includes(m.id)).map((m) => (
               <li key={m.id}>
                 <span>
                   <strong>{m.name}</strong>
@@ -148,7 +145,7 @@ function BillingHome() {
             <div className="bl-scheduled">
               <CalendarClock size={18} aria-hidden />
               <span>
-                From <strong>{formatDate(b.scheduled.effective)}</strong>: {MODULES.filter((m) => !b.scheduled!.modules.includes(m.id) && b.modules.includes(m.id)).map((m) => m.name).join(', ')} removed. New price {money(totalUsd(b.scheduled.modules))}/month.
+                From <strong>{formatDate(b.scheduled.effective)}</strong>: {LISTED.filter((m) => !b.scheduled!.modules.includes(m.id) && b.modules.includes(m.id)).map((m) => m.name).join(', ')} removed. New price {money(totalUsd(b.scheduled.modules))}/month.
               </span>
               <button className="btn btn-sm btn-ghost" onClick={undoScheduled}><Undo2 size={14} /> Undo</button>
             </div>
@@ -214,7 +211,7 @@ function BillingHome() {
           <dl className="summary-list">
             <dt>Date</dt><dd>{formatDate(inv.date)}</dd>
             <dt>Billed to</dt><dd>{state.business.name}</dd>
-            <dt>Modules</dt><dd>{inv.modules.map(moduleName).join(', ')}</dd>
+            <dt>Modules</dt><dd>{namesOf(inv.modules)}</dd>
             <dt>Amount</dt><dd>{money(inv.amountUsd)} (excl. tax)</dd>
             <dt>Status</dt><dd>{inv.status === 'paid' ? 'Paid' : 'Failed'}</dd>
           </dl>
@@ -262,13 +259,13 @@ function ChangeModules({ initial, onClose, onDone }: { initial: ModuleId[]; onCl
       }
     >
       <ul className="bl-picker">
-        {MODULES.map((m) => (
+        {LISTED.map((m) => (
           <li key={m.id}>
             <label className={m.locked ? 'locked' : ''}>
               <input type="checkbox" checked={sel.includes(m.id)} disabled={m.locked} onChange={() => toggle(m.id)} />
               <span>
                 <strong>{m.name}</strong>
-                <span className="muted small">{m.desc}{m.requires ? ` · needs ${m.requires.map(moduleName).join(', ')}` : ''}{m.locked ? ' · always included' : ''}</span>
+                <span className="muted small">{m.desc}{m.requires ? ` · needs ${namesOf(m.requires)}` : ''}{m.locked ? ' · always included' : ''}</span>
               </span>
               <span className="bl-price">{money(m.priceUsd)}</span>
             </label>
@@ -276,7 +273,7 @@ function ChangeModules({ initial, onClose, onDone }: { initial: ModuleId[]; onCl
         ))}
       </ul>
       <div className="row gap-sm">
-        <button className="btn btn-xs btn-ghost" onClick={() => setSel([...STARTER])}>Starter set</button>
+        <button className="btn btn-xs btn-ghost" onClick={() => setSel([...STARTER])}>Growth only</button>
         <button className="btn btn-xs btn-ghost" onClick={() => setSel([...ALL_MODULES])}>All modules</button>
       </div>
       {deps.map((x) => (
@@ -298,8 +295,8 @@ function QuotePreview({ q }: { q: Quote }) {
       <ul>
         {q.savingUsd > 0 && <li>You save {money(q.savingUsd)} per month.</li>}
         {q.savingUsd < 0 && <li>Your monthly price goes up by {money(-q.savingUsd)}.</li>}
-        {q.added.length > 0 && <li>{q.added.map(moduleName).join(', ')} available right away. Charged today for the rest of this period: {money(q.chargeNowUsd)}.</li>}
-        {q.removed.length > 0 && <li>{q.removed.map(moduleName).join(', ')} stay{q.removed.length === 1 ? 's' : ''} active until {formatDate(q.effective)}, then removed. You can undo this before then.</li>}
+        {q.added.length > 0 && <li>{namesOf(q.added)} available right away. Charged today for the rest of this period: {money(q.chargeNowUsd)}.</li>}
+        {q.removed.length > 0 && <li>{namesOf(q.removed)} stay{q.removed.length === 1 ? 's' : ''} active until {formatDate(q.effective)}, then removed. You can undo this before then.</li>}
         {q.consequences.map((c) => <li key={c} className="bl-conseq">{c}</li>)}
       </ul>
     </div>
@@ -308,7 +305,7 @@ function QuotePreview({ q }: { q: Quote }) {
 
 function ReactivateModal({ onClose }: { onClose: () => void }) {
   const { update, toast } = useStore();
-  const [sel, setSel] = useState<ModuleId[]>(['core', 'grow', 'inbox']);
+  const [sel, setSel] = useState<ModuleId[]>(['core', 'grow']);
   const deps = missingDependencies(sel);
   return (
     <Modal
@@ -325,7 +322,7 @@ function ReactivateModal({ onClose }: { onClose: () => void }) {
               d.billing.discount = null; // old discounts are not reapplied
               d.billing.periodEnd = addMonths(new Date().toISOString().slice(0, 10), 1);
               d.billing.invoices.unshift({ id: `INV-${1000 + d.billing.invoices.length + 1}`, date: new Date().toISOString().slice(0, 10), amountUsd: totalUsd(sel), status: 'paid', modules: sel });
-              clientLog(d, 'setting', `Reactivated subscription (${sel.map(moduleName).join(', ')})`);
+              clientLog(d, 'setting', `Reactivated subscription (${namesOf(sel)})`);
             });
             toast('Welcome back. Your campaign and Lead Flows stay paused until you review and turn them on.', 'success');
             onClose();
@@ -335,7 +332,7 @@ function ReactivateModal({ onClose }: { onClose: () => void }) {
     >
       <p className="small">Current prices apply. Earlier discounts are not reapplied. Your audience, conversations, leads and flows were kept.</p>
       <ul className="bl-picker">
-        {MODULES.map((m) => (
+        {LISTED.map((m) => (
           <li key={m.id}>
             <label className={m.locked ? 'locked' : ''}>
               <input type="checkbox" checked={sel.includes(m.id)} disabled={m.locked} onChange={() => setSel((s) => (s.includes(m.id) ? s.filter((x) => x !== m.id) : [...s, m.id]))} />
@@ -414,7 +411,7 @@ function CancelFlow() {
 
   const confirmPreview = () => {
     let res = { pending: false, message: '' };
-    if (preview === 'downgrade') update((d) => { redeemOffer(d, 'downgrade'); res = commitChange(d, { apply: 'modules', label: 'Switch to Grow and Inbox & AI', modules: [...STARTER] }); });
+    if (preview === 'downgrade') update((d) => { redeemOffer(d, 'downgrade'); res = commitChange(d, { apply: 'modules', label: 'Switch to Growth only', modules: [...STARTER] }); });
     if (preview === 'discount') update((d) => { res = commitChange(d, { apply: 'discount', label: `${disc.percent}% off for ${disc.months} months`, percent: disc.percent, months: disc.months }); });
     if (preview === 'pause') update((d) => { redeemOffer(d, 'pause'); res = commitChange(d, { apply: 'pause', label: `Pause for ${pauseMonths} month${pauseMonths > 1 ? 's' : ''}`, months: pauseMonths }); });
     const outcome = preview === 'downgrade' ? 'downgraded' : preview === 'discount' ? 'discount' : 'paused';

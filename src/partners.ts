@@ -1,5 +1,6 @@
 import type { LedgerEntry, PartnerAgreement, PartnerHistory, PartnerPayout, PartnerRecord, PartnerReferral, State, ModuleId } from './types';
-import { addDays, fmtDate } from './billing';
+import { PLAN_BASE, PLAN_FULL, addDays, fmtDate } from './billing';
+import { IS_PROMOVIEW } from './brand';
 
 /**
  * Partner Program engine (spec §18). Pure helpers over a PartnerRecord.
@@ -21,8 +22,8 @@ export function durationLabel(a: { whilePaying?: boolean; durationMonths: number
 
 /** Plan name shown to partners, derived from the monthly amount only (no customer details). */
 export function planLabel(mrrUsd: number) {
-  if (mrrUsd === 97) return 'Starter';
-  if (mrrUsd === 297) return 'Growth';
+  if (mrrUsd === PLAN_BASE) return 'Growth';
+  if (mrrUsd === PLAN_FULL) return 'Full package';
   return mrrUsd > 0 ? 'Custom modules' : '—';
 }
 
@@ -49,7 +50,7 @@ export function nextPayoutDate() {
 }
 
 export const usd = (v: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+  new Intl.NumberFormat(IS_PROMOVIEW ? 'nl-NL' : 'en-US', { style: 'currency', currency: IS_PROMOVIEW ? 'EUR' : 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
 export const round2 = (v: number) => Math.round(v * 100) / 100;
 export const today = () => new Date().toISOString().slice(0, 10);
 
@@ -124,7 +125,9 @@ export function demoPartner(s: State): PartnerRecord | undefined {
 
 /** Paid modules plus complimentary partner modules. Granting never touches billing. */
 export function entitledModules(s: State): ModuleId[] {
-  return Array.from(new Set([...s.billing.modules, ...grantedModules(demoPartner(s))]));
+  // Grow is part of the Growth base plan, so it comes with every active subscription
+  const base: ModuleId[] = s.billing.modules.includes('core') && s.billing.status !== 'ended' ? ['grow'] : [];
+  return Array.from(new Set([...s.billing.modules, ...base, ...grantedModules(demoPartner(s))]));
 }
 
 export interface Calc {

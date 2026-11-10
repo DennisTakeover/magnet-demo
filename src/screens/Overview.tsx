@@ -198,14 +198,6 @@ export default function Overview() {
 
       <Checklist />
       <UpgradeHint
-        module="grow"
-        context="overview"
-        title="Reach more of your ideal customers"
-        body="Grow puts your profile in front of people who match your audience, within a daily limit you control."
-        limits="you set topics, sources and blocked words"
-        example={[{ label: 'Daily interactions', value: 'Up to 100 (you choose)' }, { label: 'Audience', value: 'Topics, regions and similar accounts' }, { label: 'Control', value: 'Pause any time; protected accounts never touched' }]}
-      />
-      <UpgradeHint
         module="planner"
         context="overview"
         title="Plan your posts a week ahead"

@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Sparkles, X } from 'lucide-react';
 import { clientLog, useStore } from '../store';
 import { money } from '../i18n/locale';
-import { MODULES, missingDependencies, moduleName } from '../billing';
+import { MODULES, missingDependencies, namesOf } from '../billing';
 import { entitledModules } from '../partners';
 import { Modal } from './ui';
 import type { ModuleId } from '../types';
@@ -41,7 +41,7 @@ export default function UpgradeHint({ module, context, title, body, example, lim
       <div className="upgrade-text">
         <strong>{title}</strong>
         <p className="small">{body}</p>
-        <p className="xsmall muted">{m.name} · {money(price)}/month{deps.length ? ` (includes ${deps.map(moduleName).join(', ')})` : ''}{limits ? ` · ${limits}` : ''}</p>
+        <p className="xsmall muted">{m.name} · {money(price)}/month{deps.length ? ` (includes ${namesOf(deps)})` : ''}{limits ? ` · ${limits}` : ''}</p>
         {caveat && <p className="xsmall caveat">{caveat}</p>}
       </div>
       <div className="upgrade-actions">

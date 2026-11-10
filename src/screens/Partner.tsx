@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AlertTriangle, Check, CheckCircle2, Clock, Copy, FileText, Gift, Handshake, Link2, Lock, ShieldCheck, Wallet } from 'lucide-react';
 import { logActivity, navigate, routeQuery, useStore } from '../store';
 import { Badge, Field, Modal, PageHeader, dateTime } from '../components/ui';
-import { moduleName } from '../billing';
+import { namesOf, PLAN_BASE, PLAN_FULL } from '../billing';
 import {
   APP_STATUS, LEDGER_STATE, PAYOUT_STATE, POLICY_VERSION, agreementOf, calcCommission, demoPartner, earningsActive, fmt, hist, isAccepted,
   missingTerms, newReferral, PROGRAM_RATE, durationLabel, earningsByMonth, nextPayoutDate, planLabel, round2, payoutBlockers, recordPaidInvoice, recordRefund, summary, today, usd,
@@ -275,7 +275,7 @@ function OverviewTab({ rec }: { rec: PartnerRecord }) {
           <span className="eyebrow" id="earn-h">You earn</span>
           <strong className="earn-rate">{a.ratePercent ?? '—'}%</strong>
           <p className="small">of everything your referred customers pay MAGNET, {durationLabel(a)}. Excl. tax, after discounts and refunds.</p>
-          <p className="xsmall muted">Example: a customer on Starter pays {usd(97)} a month → you get <strong>{usd(calcCommission(a, 97).amountUsd)}</strong>. On Growth ({usd(297)}) → <strong>{usd(calcCommission(a, 297).amountUsd)}</strong> a month.</p>
+          <p className="xsmall muted">Example: a customer on Growth pays {usd(PLAN_BASE)} a month → you get <strong>{usd(calcCommission(a, PLAN_BASE).amountUsd)}</strong>. On the full package ({usd(PLAN_FULL)}) → <strong>{usd(calcCommission(a, PLAN_FULL).amountUsd)}</strong> a month.</p>
         </div>
         <div className="earn-figures">
           <div><span className="metric-label">Current monthly earnings</span><span className="metric-value">{s.estimated == null ? '—' : usd(s.estimated)}</span><span className="metric-def">From {s.paying} paying customer{s.paying === 1 ? '' : 's'} · ≈ {yearly == null ? '—' : usd(yearly)} a year if they stay</span></div>
@@ -346,7 +346,7 @@ function OverviewTab({ rec }: { rec: PartnerRecord }) {
           <h2><Gift size={18} aria-hidden /> Complimentary access</h2>
           {isAccepted(rec) && prog.status !== 'ended' ? (
             <>
-              <p className="small">{a.grantModules.map(moduleName).join(', ')}</p>
+              <p className="small">{namesOf(a.grantModules)}</p>
               <p className="muted small">Until {a.grantUntil ? fmt(a.grantUntil) : '—'}. Linked to your agreed deliverables. When it ends we show what stops first; paid continuation is always your own choice.</p>
             </>
           ) : (
@@ -368,7 +368,7 @@ function OverviewTab({ rec }: { rec: PartnerRecord }) {
 export function EarningsCalculator({ rate, duration }: { rate: number; duration: number | null }) {
   const [starter, setStarter] = useState(5);
   const [growth, setGrowth] = useState(2);
-  const monthly = round2(((starter * 97 + growth * 297) * rate) / 100);
+  const monthly = round2(((starter * PLAN_BASE + growth * PLAN_FULL) * rate) / 100);
   const span = duration ?? 12;
   const ongoing = duration == null;
   return (
@@ -377,13 +377,13 @@ export function EarningsCalculator({ rate, duration }: { rate: number; duration:
       <p className="small muted">Move the sliders to see what {rate}% of your referred customers’ payments adds up to.</p>
       <div className="calc-grid">
         <label className="calc-row">
-          <span>Customers on Starter <span className="muted xsmall">({usd(97)}/month → you {usd((97 * rate) / 100)})</span></span>
-          <input type="range" min={0} max={50} value={starter} onChange={(e) => setStarter(Number(e.target.value))} aria-label="Customers on Starter" />
+          <span>Customers on Growth <span className="muted xsmall">({usd(PLAN_BASE)}/month → you {usd((PLAN_BASE * rate) / 100)})</span></span>
+          <input type="range" min={0} max={50} value={starter} onChange={(e) => setStarter(Number(e.target.value))} aria-label="Customers on Growth" />
           <strong>{starter}</strong>
         </label>
         <label className="calc-row">
-          <span>Customers on Growth <span className="muted xsmall">({usd(297)}/month → you {usd((297 * rate) / 100)})</span></span>
-          <input type="range" min={0} max={50} value={growth} onChange={(e) => setGrowth(Number(e.target.value))} aria-label="Customers on Growth" />
+          <span>Customers on the full package <span className="muted xsmall">({usd(PLAN_FULL)}/month → you {usd((PLAN_FULL * rate) / 100)})</span></span>
+          <input type="range" min={0} max={50} value={growth} onChange={(e) => setGrowth(Number(e.target.value))} aria-label="Customers on the full package" />
           <strong>{growth}</strong>
         </label>
       </div>
@@ -463,7 +463,7 @@ function LinksTab({ rec }: { rec: PartnerRecord }) {
         tone = 'info';
         return;
       }
-      const amount = d.persona === 'webshop' ? 297 : 97;
+      const amount = d.persona === 'webshop' ? PLAN_FULL : PLAN_BASE;
       const res = recordPaidInvoice(r, target.id, `INV-D${9100 + n}-L1`, amount);
       if (res === 'credited') {
         msg = `${target.ref} paid their first invoice. Attribution is now locked and a provisional commission was added.`;
@@ -638,7 +638,7 @@ function EarningsTab({ rec }: { rec: PartnerRecord }) {
             {a.basis === 'contribution_profit'
               ? <>For each paid invoice: collected subscription revenue (excl. tax, after discounts and refunds) minus the agreed costs ({a.costs.paymentFeePercent}% payment fee and {usd(a.costs.serviceCostUsd)} service cost), never below zero, × {a.ratePercent}%.</>
               : <>For each paid invoice: collected subscription revenue (excl. tax, after discounts and refunds) × {a.ratePercent}%.</>}
-            {' '}Example for a {usd(97)} invoice: {usd(calcCommission(a, 97).amountUsd)}. Paid {durationLabel(a)}.
+            {' '}Example for a {usd(PLAN_BASE)} invoice: {usd(calcCommission(a, PLAN_BASE).amountUsd)}. Paid {durationLabel(a)}.
           </p>
         )}
         <p className="muted xsmall">Settlement currency: USD. Refunds create a linked correction; earlier entries are never changed.</p>
@@ -735,7 +735,7 @@ function AgreementTab({ rec }: { rec: PartnerRecord }) {
       if (ag.acceptedAt) return;
       ag.acceptedAt = Date.now();
       r.application.history.push(hist(actor(d), `Accepted agreement v${ag.version}`));
-      logActivity(d, { actor: actor(d), actorRole: 'client', clientId: 'c1', type: 'partner', action: `Accepted partner agreement v${ag.version}; complimentary ${ag.grantModules.map(moduleName).join(', ')} until ${ag.grantUntil}`, result: 'success' });
+      logActivity(d, { actor: actor(d), actorRole: 'client', clientId: 'c1', type: 'partner', action: `Accepted partner agreement v${ag.version}; complimentary ${namesOf(ag.grantModules)} until ${ag.grantUntil}`, result: 'success' });
     });
     toast('Agreement accepted. Your referral link is active.', 'success');
   };
@@ -760,7 +760,7 @@ function AgreementTab({ rec }: { rec: PartnerRecord }) {
     ['Attribution window', `${a.attributionDays} days · policy ${POLICY_VERSION}`],
     ['Payout minimum', a.payoutMinimumUsd != null ? usd(a.payoutMinimumUsd) : 'Not set'],
     ['Hold period', `${a.holdDays} days`],
-    ['Complimentary modules', `${a.grantModules.map(moduleName).join(', ')} until ${a.grantUntil ? fmt(a.grantUntil) : '—'}`],
+    ['Complimentary modules', `${namesOf(a.grantModules)} until ${a.grantUntil ? fmt(a.grantUntil) : '—'}`],
     ['Commitments', `${prog.commitments.length} items, see Content & commitments`],
     ['Next review', a.reviewDate ? fmt(a.reviewDate) : '—'],
   ];
@@ -780,7 +780,7 @@ function AgreementTab({ rec }: { rec: PartnerRecord }) {
           <>
             {overlap.length > 0 && (
               <div className="notice notice-neutral small">
-                You already pay for {overlap.map(moduleName).join(', ')}. Accepting doesn’t change your invoice automatically: the team proposes any billing adjustment and you confirm it.
+                You already pay for {namesOf(overlap)}. Accepting doesn’t change your invoice automatically: the team proposes any billing adjustment and you confirm it.
               </div>
             )}
             {missing.length > 0 && <p className="field-error" role="alert">The team still needs to set: {missing.join(', ')}. You can accept once these are complete.</p>}
@@ -807,7 +807,7 @@ export function EndConsequences({ rec, onClose, onConfirm, who }: { rec: Partner
   return (
     <Modal title="End partnership?" onClose={onClose} footer={<><button className="btn btn-ghost" onClick={onClose}>Keep partnership</button><button className="btn btn-danger" onClick={onConfirm}>End partnership</button></>}>
       <ul className="plain-list consequences small">
-        <li><strong>Complimentary access:</strong> {a.grantModules.map(moduleName).join(', ')} ends{who === 'you' ? '' : ` for ${rec.name}`}. Modules that are also paid keep working. Nothing paid starts automatically.</li>
+        <li><strong>Complimentary access:</strong> {namesOf(a.grantModules)} ends{who === 'you' ? '' : ` for ${rec.name}`}. Modules that are also paid keep working. Nothing paid starts automatically.</li>
         <li><strong>New referrals:</strong> the link and code stop crediting new signups.</li>
         <li><strong>Existing referrals:</strong> renewals follow the accepted agreement (v{a.version}).</li>
         <li><strong>Earned commission:</strong> {usd(earned)} not yet paid stays in the statement and is paid under the normal rules. Statements are kept.</li>

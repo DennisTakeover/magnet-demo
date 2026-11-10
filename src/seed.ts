@@ -85,7 +85,7 @@ export function createSeed(persona: PersonaId = 'coach'): State {
   ];
 
   return {
-    version: 16,
+    version: 17,
     persona,
     onboarded: true,
     business: p.business,
@@ -130,9 +130,9 @@ export function createSeed(persona: PersonaId = 'coach'): State {
       pending: null,
       usedDiscount: false,
       invoices: [
-        { id: 'INV-1003', date: isoDate(-12), amountUsd: 297, status: 'paid', modules: ['core', 'grow', 'inbox', 'flows', 'comments', 'planner'] },
-        { id: 'INV-1002', date: isoDate(-42), amountUsd: 297, status: 'paid', modules: ['core', 'grow', 'inbox', 'flows', 'comments', 'planner'] },
-        { id: 'INV-1001', date: isoDate(-72), amountUsd: 97, status: 'paid', modules: ['core', 'grow', 'inbox'] },
+        { id: 'INV-1003', date: isoDate(-12), amountUsd: 290, status: 'paid', modules: ['core', 'grow', 'inbox', 'flows', 'comments', 'planner'] },
+        { id: 'INV-1002', date: isoDate(-42), amountUsd: 290, status: 'paid', modules: ['core', 'grow', 'inbox', 'flows', 'comments', 'planner'] },
+        { id: 'INV-1001', date: isoDate(-72), amountUsd: 99, status: 'paid', modules: ['core', 'grow'] },
       ],
       sessions: [],
       ...(TRIAL_DAYS ? { trialEnd: isoDate(TRIAL_DAYS - 3), periodEnd: isoDate(TRIAL_DAYS - 3), invoices: [] } : {}),

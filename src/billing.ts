@@ -1,18 +1,31 @@
 import type { CancelReason, ModuleId, OfferKind, State } from './types';
 import { clientLog, logActivity } from './store';
 
-/** Example catalogue (USD per month). Starter = core+grow+inbox = 97, all modules = 297. No bundle discounts. */
-export const MODULES: { id: ModuleId; name: string; priceUsd: number; desc: string; requires?: ModuleId[]; locked?: boolean }[] = [
-  { id: 'core', name: 'Core workspace', priceUsd: 37, desc: 'Overview, Leads, settings, billing and support', locked: true },
-  { id: 'grow', name: 'Grow', priceUsd: 30, desc: 'Audience, sources and growth campaign' },
-  { id: 'inbox', name: 'Inbox & AI', priceUsd: 30, desc: 'Conversations with AI-suggested replies' },
-  { id: 'flows', name: 'Lead Flows', priceUsd: 70, desc: 'Keyword triggers that deliver your resources', requires: ['inbox'] },
-  { id: 'comments', name: 'Comments', priceUsd: 70, desc: 'AI comment drafts on target accounts' },
-  { id: 'planner', name: 'Planner', priceUsd: 60, desc: 'Content calendar and scheduling' },
+/**
+ * Catalogue (per month, in the brand's base currency: EUR for Promoview, USD for MAGNET).
+ * Growth is the base plan at 99 and always includes the Grow campaign. Everything else is an
+ * upgrade; all upgrades together make the full package of 290. No bundle discount, so switching
+ * an upgrade off always saves exactly its price.
+ */
+export const MODULES: { id: ModuleId; name: string; priceUsd: number; desc: string; requires?: ModuleId[]; locked?: boolean; hidden?: boolean }[] = [
+  { id: 'core', name: 'Growth', priceUsd: 99, desc: 'Growth campaign with your audience and sources, plus Overview, Leads and support', locked: true },
+  { id: 'grow', name: 'Grow', priceUsd: 0, desc: 'Part of Growth', locked: true, hidden: true },
+  { id: 'inbox', name: 'Inbox & AI', priceUsd: 49, desc: 'Conversations with AI-suggested replies' },
+  { id: 'flows', name: 'Lead Flows', priceUsd: 59, desc: 'Keyword triggers that deliver your resources', requires: ['inbox'] },
+  { id: 'planner', name: 'Planner', priceUsd: 44, desc: 'Content calendar and scheduling' },
+  { id: 'comments', name: 'Comments', priceUsd: 39, desc: 'AI comment drafts on target accounts' },
 ];
 
-export const STARTER: ModuleId[] = ['core', 'grow', 'inbox'];
+/** Modules shown in lists and pickers (Grow is folded into Growth). */
+export const LISTED = MODULES.filter((m) => !m.hidden);
+/** The base plan: Growth only. */
+export const STARTER: ModuleId[] = ['core', 'grow'];
 export const ALL_MODULES: ModuleId[] = MODULES.map((m) => m.id);
+export const PLAN_BASE = 99;
+export const PLAN_FULL = 290;
+
+/** Readable list of module names, without the folded-in Grow. */
+export const namesOf = (mods: ModuleId[]) => LISTED.filter((m) => mods.includes(m.id)).map((m) => m.name).join(', ');
 
 export const moduleName = (id: ModuleId) => MODULES.find((m) => m.id === id)!.name;
 
@@ -181,7 +194,7 @@ export const REASONS: { id: CancelReason; label: string }[] = [
 ];
 
 /** Cost to serve one module for one month (estimate used for margin guardrails). */
-export const MODULE_COST_USD: Record<ModuleId, number> = { core: 9, grow: 11, inbox: 8, flows: 14, comments: 16, planner: 7 };
+export const MODULE_COST_USD: Record<ModuleId, number> = { core: 20, grow: 0, inbox: 8, flows: 14, comments: 16, planner: 7 };
 /** Guardrail: an offer may not push the monthly margin below this share of the discounted price. */
 export const MIN_MARGIN = 0.4;
 
@@ -202,7 +215,7 @@ export function offerFor(s: State, reason: CancelReason | 'skipped' | null): Off
   const has = (k: OfferKind) => !!publishedOffer(s, k, reason);
   switch (reason) {
     case 'price': {
-      if (!onStarter && has('downgrade')) return { id: 'downgrade', title: 'Keep the essentials for less', body: 'Switch to Grow and Inbox & AI only. You keep your audience, conversations and leads.', cta: 'See the lower price' };
+      if (!onStarter && has('downgrade')) return { id: 'downgrade', title: 'Keep growing for less', body: 'Switch to Growth only. Your audience and campaign keep running, and your saved conversations and leads stay.', cta: 'See the lower price' };
       const d = publishedOffer(s, 'discount', reason);
       if (d && !b.usedDiscount) return { id: 'discount', title: `${d.percent}% off for the next ${d.months} months`, body: `A one-time discount on your current modules. After ${d.months} months the normal price applies again.`, cta: 'Review this discount' };
       return none;
@@ -257,13 +270,13 @@ export function applyChange(d: State, change: { apply: 'cancel' | 'modules' | 'p
     const q = quote(d, change.modules);
     if (q.added.length && !q.removed.length) {
       setModules(d, change.modules);
-      clientLog(d, 'setting', `Added ${q.added.map(moduleName).join(', ')}`);
-      return `Added ${q.added.map(moduleName).join(', ')}. Available now.`;
+      clientLog(d, 'setting', `Added ${namesOf(q.added)}`);
+      return `Added ${namesOf(q.added)}. Available now.`;
     }
     // Additions now, removals at renewal
     if (q.added.length) setModules(d, [...b.modules, ...q.added]);
     b.scheduled = { modules: change.modules, effective: b.periodEnd };
-    clientLog(d, 'setting', `Scheduled module change from ${b.periodEnd}: removing ${q.removed.map(moduleName).join(', ')}`);
+    clientLog(d, 'setting', `Scheduled module change from ${b.periodEnd}: removing ${namesOf(q.removed)}`);
     return `Scheduled. From ${fmtDate(b.periodEnd)} you pay the new price; until then everything keeps working.`;
   }
   if (change.apply === 'pause' && change.months) {

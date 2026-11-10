@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { logActivity, navigate, routeQuery, useStore } from '../store';
 import { Badge, Field, Modal, PageHeader, Segmented, dateTime } from '../components/ui';
 import { ReasonModal } from './shared';
-import { ALL_MODULES, addDays, addMonths, moduleName } from '../billing';
+import { addDays, addMonths, moduleName, LISTED, namesOf } from '../billing';
 import {
   APP_STATUS, FINANCE_ACTOR, LEDGER_STATE, PARTNER_MANAGER, PAYOUT_STATE, agreementOf, createBatch, failPayout, finalizeCosts, fmt, hist,
   isAccepted, markPaid, PROGRAM_BASIS, PROGRAM_RATE, missingTerms, payoutBlockers, releaseHold, round2, summary, today, usd,
@@ -220,7 +220,7 @@ function ApproveModal({ p, onClose, onDone }: { p: PartnerRecord; onClose: () =>
       </div>
       <fieldset className="check-group">
         <legend className="field-label">Complimentary modules</legend>
-        {ALL_MODULES.map((m) => (
+        {LISTED.map((m) => m.id).map((m) => (
           <label key={m} className="check"><input type="checkbox" checked={grant.includes(m)} disabled={m === 'core'} onChange={(e) => setGrant(e.target.checked ? [...grant, m] : grant.filter((x) => x !== m))} /> {moduleName(m)}</label>
         ))}
       </fieldset>
@@ -266,7 +266,7 @@ function Active() {
                   {pr.newReferralsPaused && pr.status !== 'ended' && <div className="muted xsmall">New referrals paused</div>}
                 </td>
                 <td>{pr.code}</td>
-                <td className="small">{isAccepted(p) && pr.status !== 'ended' ? `${a.grantModules.map(moduleName).join(', ')} · until ${a.grantUntil ? fmt(a.grantUntil) : '—'}` : '—'}</td>
+                <td className="small">{isAccepted(p) && pr.status !== 'ended' ? `${namesOf(a.grantModules)} · until ${a.grantUntil ? fmt(a.grantUntil) : '—'}` : '—'}</td>
                 <td>{s.paying}</td>
                 <td>{usd(s.referredMrr)}</td>
                 <td>

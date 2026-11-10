@@ -1,3 +1,4 @@
+import { IS_PROMOVIEW } from '../brand';
 import { STRINGS, UI_LANGUAGES, type UiLanguage } from './strings';
 
 export interface LocaleSettings {
@@ -133,10 +134,14 @@ function niceRound(v: number) {
   return Math.round(v / mag) * mag;
 }
 
-/** Format a USD amount in the active currency. */
-export function money(usd: number, l: LocaleSettings = active): string {
-  const rate = USD_RATES[l.currency] ?? 1;
-  const value = l.currency === 'USD' ? usd : niceRound(usd * rate);
+/**
+ * Format a catalogue amount in the active currency. Amounts are in the brand's base currency:
+ * EUR for Promoview (so €99 is exactly €99), USD for MAGNET.
+ */
+export function money(amount: number, l: LocaleSettings = active): string {
+  const base = IS_PROMOVIEW ? 'EUR' : 'USD';
+  const rate = (USD_RATES[l.currency] ?? 1) / (USD_RATES[base] ?? 1);
+  const value = l.currency === base ? amount : niceRound(amount * rate);
   try {
     return new Intl.NumberFormat(localeTag(l), { style: 'currency', currency: l.currency, maximumFractionDigits: 0 }).format(value);
   } catch {

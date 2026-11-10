@@ -4,7 +4,7 @@ import { Badge, Field, Modal, PageHeader, timeAgo } from '../components/ui';
 import { clientLog, uid, useStore } from '../store';
 import { t } from '../i18n/locale';
 import { money } from '../i18n/locale';
-import { moduleName, payableUsd, fmtDate } from '../billing';
+import { payableUsd, fmtDate, namesOf } from '../billing';
 import { SWITCH_LABEL } from '../ops';
 import type { State } from '../types';
 
@@ -49,7 +49,7 @@ export function answer(s: State, q: string): Omit<Msg, 'id' | 'from'> {
   }
   if (has('next payment', 'next charge', 'pay next', 'when do i pay', 'renew', 'invoice')) {
     const b = s.billing;
-    const text = b.status === 'cancellation_scheduled' ? `Your subscription ends on ${fmtDate(b.periodEnd)}. There are no more charges.` : b.status === 'paused' ? `Your subscription is paused until ${b.pauseUntil ? fmtDate(b.pauseUntil) : 'the date you chose'}. No charges while paused.` : `Your next charge is ${money(payableUsd(s))} on ${fmtDate(b.periodEnd)} for ${b.modules.map(moduleName).join(', ')}.`;
+    const text = b.status === 'cancellation_scheduled' ? `Your subscription ends on ${fmtDate(b.periodEnd)}. There are no more charges.` : b.status === 'paused' ? `Your subscription is paused until ${b.pauseUntil ? fmtDate(b.pauseUntil) : 'the date you chose'}. No charges while paused.` : `Your next charge is ${money(payableUsd(s))} on ${fmtDate(b.periodEnd)} for ${namesOf(b.modules)}.`;
     return { text, link: ['Open Billing', '/app/billing'], source: 'Your billing status' };
   }
   if (has('ai', 'reply', 'replying', 'draft') && paused.some((k) => k.module === 'ai')) {

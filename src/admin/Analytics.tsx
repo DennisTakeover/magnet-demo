@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Info } from 'lucide-react';
 import { useStore } from '../store';
 import { Badge, PageHeader, Segmented } from '../components/ui';
-import { MODULES, MODULE_COST_USD } from '../billing';
+import { MODULE_COST_USD, LISTED } from '../billing';
 import { grantedModules, isAccepted } from '../partners';
 import type { ModuleId } from '../types';
 
@@ -30,13 +30,13 @@ const CHANNELS = [
   { id: 'Unknown', visits: 1900, signups: 58, activated: 26, paid: 9 },
 ];
 
-// Last month = module MRR (24,037) minus active discounts (187), so the tiles reconcile
-const MRR_TREND = [14620, 16130, 18350, 19980, 22010, 23850];
+// Last month = module MRR (28,611) minus active discounts (187), so the tiles reconcile
+const MRR_TREND = [17400, 19200, 21800, 23750, 26150, 28424];
 const ACTIVE_DISCOUNTS_USD = 187;
 
 const RETENTION = { starts: 96, offerShown: 81, accepted: 33, applied: 31, cancelled: 52 };
 const SAVES: { offer: string; accepted: number; paid30: number | null; paid60: number | null; discountCostUsd: number; retainedUsd: number }[] = [
-  { offer: 'Downgrade to Starter', accepted: 11, paid30: 10, paid60: 8, discountCostUsd: 0, retainedUsd: 1067 },
+  { offer: 'Downgrade to Growth only', accepted: 11, paid30: 10, paid60: 8, discountCostUsd: 0, retainedUsd: 1067 },
   { offer: 'Temporary discount', accepted: 9, paid30: 8, paid60: null, discountCostUsd: 1604, retainedUsd: 2138 },
   { offer: 'Remove unused modules', accepted: 7, paid30: 7, paid60: 6, discountCostUsd: 0, retainedUsd: 1239 },
   { offer: 'Pause subscription', accepted: 4, paid30: null, paid60: null, discountCostUsd: 0, retainedUsd: 0 },
@@ -152,7 +152,7 @@ export default function Analytics() {
       <section className="card" aria-labelledby="mod-h">
         <h2 id="mod-h">Module mix</h2>
         <ul className="hbars wide-label" aria-label="Paying customers per module">
-          {MODULES.map((m) => {
+          {LISTED.map((m) => {
             const n = Math.round(MODULE_CUSTOMERS[m.id] * (market === 'all' ? 1 : MARKETS.find((x) => x.id === market)!.share));
             return (
               <li key={m.id} title={`${m.name}: ${n} customers, ${usd(n * m.priceUsd)} MRR`}>
@@ -163,7 +163,7 @@ export default function Analytics() {
             );
           })}
         </ul>
-        <p className="muted xsmall">Customers with the module · its MRR at list price (sum minus active discounts = MRR). Estimated cost to serve per module: {MODULES.map((m) => `${m.name} $${MODULE_COST_USD[m.id]}`).join(', ')}.</p>
+        <p className="muted xsmall">Customers with the module · its MRR at list price (sum minus active discounts = MRR). Estimated cost to serve per module: {LISTED.map((m) => `${m.name} $${MODULE_COST_USD[m.id]}`).join(', ')}.</p>
       </section>
 
       <section className="card" aria-labelledby="ret-h">

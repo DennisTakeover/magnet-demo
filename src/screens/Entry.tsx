@@ -7,7 +7,7 @@ import {
 import { PERSONAS, PERSONA_ORDER } from '../personas';
 import { navigate, useStore } from '../store';
 import { money } from '../i18n/locale';
-import { MODULES, STARTER } from '../billing';
+import { MODULES, STARTER, LISTED, PLAN_BASE, PLAN_FULL } from '../billing';
 import { PROGRAM_RATE, usd } from '../partners';
 import { BRAND, IS_PROMOVIEW, TRIAL_DAYS } from '../brand';
 import PromoviewHome from './PromoviewHome';
@@ -393,7 +393,7 @@ export function ProductMock() {
 
 const MOD_ICON: Record<ModuleId, typeof BarChart3> = { core: LayoutGrid, grow: BarChart3, inbox: InboxIcon, flows: Workflow, comments: MessageCircle, planner: CalendarDays };
 const MOD_TAG: Record<ModuleId, string> = {
-  core: 'Overview, Leads, settings and support. Always included.',
+  core: 'Your growth campaign, plus Overview, Leads and support. Always included.',
   grow: 'Reach people who match your audience.',
   inbox: 'Stay on top of what matters, with AI replies.',
   flows: 'Turn a keyword into a delivered guide and a lead.',
@@ -403,19 +403,19 @@ const MOD_TAG: Record<ModuleId, string> = {
 
 /** Price calculator: toggle modules and see the monthly total. Used on the home and pricing pages. */
 export function PlanBuilder() {
-  const [sel, setSel] = useState<ModuleId[]>(['core', 'grow', 'inbox', 'flows']);
+  const [sel, setSel] = useState<ModuleId[]>(['core', 'grow', 'inbox']);
   const toggle = (m: ModuleId, on: boolean) => {
     let next = on ? [...sel, m] : sel.filter((x) => x !== m);
     if (on && m === 'flows' && !next.includes('inbox')) next = [...next, 'inbox'];
     if (!on && m === 'inbox') next = next.filter((x) => x !== 'flows');
     setSel(next);
   };
-  const total = MODULES.filter((m) => sel.includes(m.id)).reduce((t, m) => t + m.priceUsd, 0);
+  const total = LISTED.filter((m) => sel.includes(m.id)).reduce((t, m) => t + m.priceUsd, 0);
   const preset = (mods: ModuleId[]) => setSel(mods);
   return (
     <div className="m-builder">
       <div className="m-builder-list" role="group" aria-label="Modules">
-        {MODULES.map((m) => {
+        {LISTED.map((m) => {
           const I = MOD_ICON[m.id];
           const on = sel.includes(m.id);
           return (
@@ -431,7 +431,7 @@ export function PlanBuilder() {
       <aside className="m-selection" aria-live="polite">
         <h2>Your selection</h2>
         <ul>
-          {MODULES.filter((m) => sel.includes(m.id)).map((m) => {
+          {LISTED.filter((m) => sel.includes(m.id)).map((m) => {
             const I = MOD_ICON[m.id];
             return <li key={m.id}><span className="m-icon sm"><I size={16} aria-hidden /></span>{m.name}</li>;
           })}
@@ -442,8 +442,8 @@ export function PlanBuilder() {
           <small>No bundle discount, so removing a module always saves money.</small>
         </div>
         <div className="m-presets">
-          <button className="btn btn-sm btn-secondary" onClick={() => preset([...STARTER])}>Starter · {money(97)}</button>
-          <button className="btn btn-sm btn-secondary" onClick={() => preset(MODULES.map((m) => m.id))}>Everything · {money(297)}</button>
+          <button className="btn btn-sm btn-secondary" onClick={() => preset([...STARTER])}>Growth only · {money(PLAN_BASE)}</button>
+          <button className="btn btn-sm btn-secondary" onClick={() => preset(LISTED.map((m) => m.id))}>Full package · {money(PLAN_FULL)}</button>
         </div>
         <a className="btn btn-primary btn-lg btn-block" href="#/onboarding">{TRIAL_DAYS ? `Start ${TRIAL_DAYS} dagen gratis` : 'Start with this setup'} <ArrowRight size={18} /></a>
             {TRIAL_DAYS > 0 && <small className="m-trial-note">Eerste betaling pas na {TRIAL_DAYS} dagen. Binnen die tijd opzeggen kost niets.</small>}
@@ -535,7 +535,7 @@ function PartnersPage() {
       <section className="m-section m-partner-detail">
         <div>
           <h2 className="m-hero-title sm left">Product access.<br />A personal link.<br />Clear earnings.</h2>
-          <p className="m-sub">Complimentary access to the modules you promote and {PROGRAM_RATE}% of what your referred customers pay, under a clear written agreement. A Starter customer ({usd(97)}/month) earns you {usd(97 * PROGRAM_RATE / 100)} a month; a Growth customer ({usd(297)}) earns you {usd(297 * PROGRAM_RATE / 100)}. Amounts in USD.</p>
+          <p className="m-sub">Complimentary access to the modules you promote and {PROGRAM_RATE}% of what your referred customers pay, under a clear written agreement. A customer on Growth ({usd(PLAN_BASE)}/month) earns you {usd(PLAN_BASE * PROGRAM_RATE / 100)} a month; a customer on the full package ({usd(PLAN_FULL)}) earns you {usd(PLAN_FULL * PROGRAM_RATE / 100)}.</p>
           <ul className="m-checks">
             <li><Check size={16} /> Earnings, payouts and every referral in one dashboard</li>
             <li><Check size={16} /> Paid after a short hold, once confirmed</li>

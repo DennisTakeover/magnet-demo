@@ -268,7 +268,7 @@ export function storeSeed(h: SeedHelpers): PersonaSeed {
     blockedContact: 'Daphne Kok',
     admin: {
       name: 'The Bike Corner', owner: 'Daan Visser', handle: '@thebikecorner.utrecht', niche: 'Bike shop and repairs in Utrecht',
-      plan: 'Starter', subscription: 'Active', campaign: 'active', connection: 'connected', aiMode: 'assist', dailyLimit: 60,
+      plan: 'Growth', subscription: 'Active', campaign: 'active', connection: 'connected', aiMode: 'assist', dailyLimit: 60,
       audienceSummary: 'Cycling, commuting, e-bikes · NL, EN · within 15 km of Utrecht',
       flows: [{ id: 'f1', name: 'Free service check', status: 'active' }, { id: 'f3', name: 'Student deal', status: 'paused' }],
     },

@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react';
 import { Eye, Lock, Mail, ShieldCheck, Trash2, UserPlus } from 'lucide-react';
 import { clientLog, navigate, uid, useStore } from '../store';
 import { Avatar, Badge, Field, Modal, timeAgo } from '../components/ui';
-import { MODULES, moduleName } from '../billing';
+import { LISTED, namesOf } from '../billing';
 import { entitledModules } from '../partners';
 import type { MemberPermissions, ModuleId, TeamMember } from '../types';
 
@@ -52,7 +52,7 @@ export default function TeamTab() {
             <Avatar name={m.name} color="#12805C" size={36} />
             <div className="team-text">
               <strong>{m.name}</strong>
-              <span className="muted xsmall">{m.email} · {m.modules.length ? m.modules.map(moduleName).join(', ') : 'Core pages only'}</span>
+              <span className="muted xsmall">{m.email} · {m.modules.length ? namesOf(m.modules) : 'Core pages only'}</span>
               <span className="muted xsmall">{PERMS.filter((p) => m.permissions[p.k] && m.modules.includes(p.needs)).map((p) => p.label).join(' · ') || 'View only'}</span>
             </div>
             {m.status === 'invited' ? <Badge tone="amber">Invited {timeAgo(m.invitedAt)}</Badge> : <Badge tone="green">Active</Badge>}
@@ -99,7 +99,7 @@ function MemberModal({ member, owned, onClose }: { member: TeamMember | null; ow
       PERMS.forEach((p) => { if (!mods.includes(p.needs)) cleanPerms[p.k] = false; });
       if (member) {
         Object.assign(d.team.find((x) => x.id === member.id)!, { name: name.trim(), modules: mods, permissions: cleanPerms });
-        clientLog(d, 'setting', `Changed access for ${name.trim()}: ${mods.map(moduleName).join(', ') || 'core pages only'}`);
+        clientLog(d, 'setting', `Changed access for ${name.trim()}: ${namesOf(mods) || 'core pages only'}`);
       } else {
         d.team.push({ id: uid('tm'), name: name.trim(), email: email.trim(), modules: mods, permissions: cleanPerms, status: 'invited', invitedAt: Date.now() });
         clientLog(d, 'setting', `Invited ${email.trim()} as team member`);
@@ -117,7 +117,7 @@ function MemberModal({ member, owned, onClose }: { member: TeamMember | null; ow
       <fieldset className="check-group">
         <legend className="field-label">Modules they can use</legend>
         <p className="muted xsmall">Overview, Leads and Help are always included.</p>
-        {MODULES.filter((m) => m.id !== 'core').map((m) => (
+        {LISTED.filter((m) => m.id !== 'core').map((m) => (
           <label key={m.id} className="check">
             <input type="checkbox" disabled={!owned.includes(m.id)} checked={mods.includes(m.id)} onChange={(e) => setMods(e.target.checked ? [...mods, m.id] : mods.filter((x) => x !== m.id))} />
             {m.name}{!owned.includes(m.id) && <span className="muted xsmall"> · not in your plan</span>}

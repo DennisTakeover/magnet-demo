@@ -3,7 +3,7 @@ import { AlertTriangle, Lock, ShieldCheck } from 'lucide-react';
 import { logActivity, navigate, routeQuery, uid, useStore } from '../store';
 import { Badge, Field, Modal, PageHeader, Segmented, dateTime } from '../components/ui';
 import { ReasonModal } from './shared';
-import { MIN_MARGIN, MODULES, MODULE_COST_USD, REASONS, STARTER, addDays, fmtDate, moduleName } from '../billing';
+import { MIN_MARGIN, MODULES, MODULE_COST_USD, REASONS, STARTER, addDays, fmtDate, moduleName, LISTED, namesOf } from '../billing';
 import type { ModuleId, OfferKind, RetentionOffer } from '../types';
 
 export const COMMERCIAL_ACTOR = 'Ines Moreau (commercial admin)';
@@ -15,7 +15,7 @@ const TABS = [
 ] as const;
 
 export const OFFER_LABEL: Record<OfferKind, string> = {
-  downgrade: 'Downgrade to Starter',
+  downgrade: 'Downgrade to Growth only',
   discount: 'Temporary discount',
   modules: 'Remove unused modules',
   support: 'Free setup help / review',
@@ -25,11 +25,11 @@ export const OFFER_LABEL: Record<OfferKind, string> = {
 
 const usd = (v: number) => `$${v.toFixed(v % 1 ? 2 : 0)}`;
 const costOf = (mods: ModuleId[]) => mods.reduce((t, m) => t + MODULE_COST_USD[m], 0);
-const priceOf = (mods: ModuleId[]) => MODULES.filter((m) => mods.includes(m.id)).reduce((t, m) => t + m.priceUsd, 0);
+const priceOf = (mods: ModuleId[]) => LISTED.filter((m) => mods.includes(m.id)).reduce((t, m) => t + m.priceUsd, 0);
 /** Margin as a share of what the customer actually pays. */
 export const marginAt = (priceUsd: number, costUsd: number) => (priceUsd <= 0 ? -1 : (priceUsd - costUsd) / priceUsd);
 const pct = (v: number) => `${Math.round(v * 100)}%`;
-const ALL: ModuleId[] = MODULES.map((m) => m.id);
+const ALL: ModuleId[] = LISTED.map((m) => m.id);
 
 /** Largest discount that keeps both packages above the margin guardrail. */
 export function maxDiscount(): number {
@@ -71,7 +71,7 @@ function Pricing({ canEdit }: { canEdit: boolean }) {
   const { state, update, toast } = useStore();
   const [edit, setEdit] = useState<ModuleId | null>(null);
   const packages = [
-    { name: 'Starter', mods: STARTER },
+    { name: 'Growth (base)', mods: STARTER },
     { name: 'Growth (all modules)', mods: ALL },
   ];
   const publish = (id: string) => {
@@ -90,12 +90,12 @@ function Pricing({ canEdit }: { canEdit: boolean }) {
         <table className="table">
           <thead><tr><th>Module</th><th>Price / month</th><th>Cost to serve</th><th>Margin</th><th>Next version</th><th></th></tr></thead>
           <tbody>
-            {MODULES.map((m) => {
+            {LISTED.map((m) => {
               const pv = [...state.priceVersions].reverse().find((v) => v.module === m.id);
               const margin = marginAt(m.priceUsd, MODULE_COST_USD[m.id]);
               return (
                 <tr key={m.id}>
-                  <td><strong>{m.name}</strong><div className="muted xsmall">{m.desc}{m.requires ? ` · needs ${m.requires.map(moduleName).join(', ')}` : ''}{m.locked ? ' · always included' : ''}</div></td>
+                  <td><strong>{m.name}</strong><div className="muted xsmall">{m.desc}{m.requires ? ` · needs ${namesOf(m.requires)}` : ''}{m.locked ? ' · always included' : ''}</div></td>
                   <td>{usd(m.priceUsd)}</td>
                   <td>{usd(MODULE_COST_USD[m.id])} <span className="muted xsmall">est.</span></td>
                   <td><Badge tone={margin >= MIN_MARGIN ? 'green' : 'red'}>{pct(margin)}</Badge></td>
@@ -273,7 +273,7 @@ function OfferModal({ kind, onClose }: { kind: OfferKind; onClose: () => void })
         <Field label="Valid until" hint="Leave empty for no end date"><input type="date" value={until} onChange={(e) => setUntil(e.target.value)} /></Field>
       </div>
       {kind === 'discount' && p > 0 && (
-        <p className="small">Starter during the discount: {usd(Math.round(starter * (1 - p / 100) * 100) / 100)} · margin {pct(marginAt(starter * (1 - p / 100), costOf(STARTER)))} {p > max && <span className="field-error"><AlertTriangle size={12} aria-hidden /> below guardrail</span>}</p>
+        <p className="small">Growth during the discount: {usd(Math.round(starter * (1 - p / 100) * 100) / 100)} · margin {pct(marginAt(starter * (1 - p / 100), costOf(STARTER)))} {p > max && <span className="field-error"><AlertTriangle size={12} aria-hidden /> below guardrail</span>}</p>
       )}
       <Field label="Reason (logged)"><textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} /></Field>
       {touched && errors.length > 0 && <ul className="plain-list small field-error" role="alert">{errors.map((e) => <li key={e}>{e}</li>)}</ul>}

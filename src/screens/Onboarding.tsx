@@ -9,7 +9,7 @@ import { SiteNav, img } from './Entry';
 import MagnetArt from '../components/MagnetArt';
 import { createSeed } from '../seed';
 import { PERSONAS, PERSONA_ORDER } from '../personas';
-import { MODULES, STARTER, addMonths, missingDependencies, moduleName, totalUsd } from '../billing';
+import { LISTED, STARTER, addMonths, missingDependencies, moduleName, namesOf, totalUsd } from '../billing';
 import { money } from '../i18n/locale';
 import { AiTag, Badge, ChipInput, Field, formatDate } from '../components/ui';
 import type { AiMode, GoalId, GrowthConnection, ModuleId, PersonaId } from '../types';
@@ -162,7 +162,7 @@ export default function Onboarding() {
       if (growth === 'connected') markActivation(d, 'connect_growth');
       markActivation(d, 'audience_saved');
       d.onboarded = true;
-      clientLog(d, 'setting', `Completed onboarding (${mods.map(moduleName).join(', ')})`);
+      clientLog(d, 'setting', `Completed onboarding (${namesOf(mods)})`);
     });
     toast('You’re set up. Follow the checklist to get your first result.', 'success');
     navigate('/app/overview');
@@ -404,11 +404,11 @@ export default function Onboarding() {
               <h1 id="onb-title">Choose your modules</h1>
               <p className="muted">Pay only for what you use. You can add or remove modules any time in Billing.</p>
               <ul className="bl-picker">
-                {MODULES.map((m) => (
+                {LISTED.map((m) => (
                   <li key={m.id}>
                     <label className={m.locked ? 'locked' : ''}>
                       <input type="checkbox" checked={mods.includes(m.id)} disabled={m.locked || paying !== 'idle'} onChange={() => setMods((s) => (s.includes(m.id) ? s.filter((x) => x !== m.id) : [...s, m.id]))} />
-                      <span><strong>{m.name}</strong><span className="muted small">{m.desc}{m.requires ? ` · needs ${m.requires.map(moduleName).join(', ')}` : ''}</span></span>
+                      <span><strong>{m.name}</strong><span className="muted small">{m.desc}{m.requires ? ` · needs ${namesOf(m.requires)}` : ''}</span></span>
                       <span className="bl-price">{money(m.priceUsd)}</span>
                     </label>
                   </li>

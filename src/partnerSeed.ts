@@ -51,13 +51,13 @@ export function seedPartners(clients: AdminClient[], h: H): PartnerRecord[] {
     time: h.ago(-offset * 30 * h.DAY + 2 * h.DAY),
   });
   const ledger: LedgerEntry[] = [
-    entry('R-4811', 'INV-8812-L1', 97, -2, 'paid', 'PO-301'),
-    entry('R-4848', 'INV-8840-L1', 297, -2, 'paid', 'PO-301'),
-    entry('R-4811', 'INV-8901-L1', 97, -1, 'approved'),
-    entry('R-4848', 'INV-8933-L1', 297, -1, 'approved'),
-    entry('R-4885', 'INV-8950-L1', 97, -1, 'pending_hold'),
-    entry('R-4811', 'INV-9012-L1', 97, 0, 'provisional'),
-    entry('R-4848', 'INV-9030-L1', 297, 0, 'provisional'),
+    entry('R-4811', 'INV-8812-L1', 99, -2, 'paid', 'PO-301'),
+    entry('R-4848', 'INV-8840-L1', 290, -2, 'paid', 'PO-301'),
+    entry('R-4811', 'INV-8901-L1', 99, -1, 'approved'),
+    entry('R-4848', 'INV-8933-L1', 290, -1, 'approved'),
+    entry('R-4885', 'INV-8950-L1', 99, -1, 'pending_hold'),
+    entry('R-4811', 'INV-9012-L1', 99, 0, 'provisional'),
+    entry('R-4848', 'INV-9030-L1', 290, 0, 'provisional'),
   ];
   const paidTotal = Math.round((ledger[0].amountUsd + ledger[1].amountUsd) * 100) / 100;
 
@@ -96,8 +96,8 @@ export function seedPartners(clients: AdminClient[], h: H): PartnerRecord[] {
           { id: 'cm4', channel: 'Newsletter', format: 'Mention with tracked link', deadline: h.isoDate(14), status: 'submitted', evidenceUrl: 'newsletter.example.com/issue-41', history: [{ time: h.ago(h.DAY), actor: `${c2.owner} (client)`, action: 'Submitted evidence' }] },
         ],
         referrals: [
-          { id: 'r1', ref: 'R-4811', segment: 'Coach', status: 'paying', via: 'code', signedUpAt: h.ago(64 * h.DAY), lockedAt: h.ago(60 * h.DAY), mrrUsd: 97 },
-          { id: 'r2', ref: 'R-4848', segment: 'Webshop', status: 'paying', via: 'link', signedUpAt: h.ago(58 * h.DAY), lockedAt: h.ago(55 * h.DAY), mrrUsd: 297 },
+          { id: 'r1', ref: 'R-4811', segment: 'Coach', status: 'paying', via: 'code', signedUpAt: h.ago(64 * h.DAY), lockedAt: h.ago(60 * h.DAY), mrrUsd: 99 },
+          { id: 'r2', ref: 'R-4848', segment: 'Webshop', status: 'paying', via: 'link', signedUpAt: h.ago(58 * h.DAY), lockedAt: h.ago(55 * h.DAY), mrrUsd: 290 },
           { id: 'r3', ref: 'R-4885', segment: 'Local shop', status: 'cancelled', via: 'link', signedUpAt: h.ago(40 * h.DAY), lockedAt: h.ago(38 * h.DAY), mrrUsd: 0 },
           { id: 'r4', ref: 'R-4922', segment: 'Coach', status: 'trial', via: 'unknown', signedUpAt: h.ago(4 * h.DAY), lockedAt: null, mrrUsd: 0 },
           { id: 'r5', ref: 'R-4959', segment: 'Webshop', status: 'needs_review', via: 'code', signedUpAt: h.ago(2 * h.DAY), lockedAt: null, mrrUsd: 0, flag: 'Billing identity matches the partner’s own account' },
