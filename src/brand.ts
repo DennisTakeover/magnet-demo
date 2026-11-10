@@ -25,7 +25,7 @@ export const BRAND_ID: BrandId = detect();
 export const IS_PROMOVIEW = BRAND_ID === 'promoview';
 
 export const BRAND = IS_PROMOVIEW
-  ? { id: BRAND_ID, name: 'Promoview', wordmark: 'promoview', title: 'Promoview · Instagram-groei met AI', storageKey: 'promoview-demo-state' }
+  ? { id: BRAND_ID, name: 'Promoview', wordmark: 'Promoview', title: 'Promoview · Instagram-groei met AI', storageKey: 'promoview-demo-state' }
   : { id: BRAND_ID, name: 'MAGNET', wordmark: 'magnet', title: 'MAGNET Demo', storageKey: 'magnet-demo-state' };
 
 /** In the Promoview build every on-screen "MAGNET" becomes "Promoview". */

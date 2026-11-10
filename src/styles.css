@@ -2047,21 +2047,7 @@ a.action-item:hover { background: #fff; }
 .m-home .m-builder { max-width: 1080px; margin: 0 auto; }
 @media (max-width: 900px) { .tp-grid { grid-template-columns: 1fr; } .m-vsl-frame { border-radius: 24px; } .m-vsl-play { width: 76px; height: 76px; } .m-vsl-caption { font-size: 15px; bottom: 14px; } .m-vsl-magnet { width: 160px; height: 160px; } }
 
-/* ═════════════ Brand: Promoview (NL/BE) ═════════════ */
-:root[data-brand=promoview] {
-  --accent: #0a7fe6;
-  --accent-ink: #0667c2;
-  --accent-soft: #e6f3ff;
-  --accent-soft-2: #cfe6ff;
-  --violet: #0a7fe6;
-  --violet-soft: #e6f3ff;
-}
-[data-brand=promoview] .btn-primary { box-shadow: 0 6px 18px rgba(10, 127, 230, 0.3); }
-[data-brand=promoview] .hbar-fill { background: linear-gradient(90deg, #38a4ff, var(--accent)); }
-[data-brand=promoview] .col-bar, [data-brand=promoview] .col:last-child .col-bar { background: linear-gradient(180deg, #4fb0ff, var(--accent)); }
-[data-brand=promoview] .m-final-band, [data-brand=promoview] .m-plan.featured { background: radial-gradient(600px 300px at 15% 0%, #4fb0ff 0%, transparent 70%), linear-gradient(140deg, #0a7fe6, #0553a8); box-shadow: 0 40px 80px rgba(10, 127, 230, 0.3); }
-[data-brand=promoview] .tc-fab, [data-brand=promoview] .m-vsl-play { box-shadow: 0 14px 30px rgba(10, 127, 230, 0.4); }
-[data-brand=promoview] .ai-draft, [data-brand=promoview] .m-approve-card, [data-brand=promoview] .tc-head { background: linear-gradient(135deg, #e3f1ff, #eef6ff); }
+/* Promoview brand theme lives in promoview.css (generated) and promoview-brand.css */
 .pv-cases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .pv-case { background: var(--glass); border: 1px solid #fff; border-radius: 26px; padding: 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px; }
 .pv-case:nth-child(4n + 1) { background: linear-gradient(160deg, #e9f4ff, #dcebff); }

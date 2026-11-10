@@ -1,4 +1,4 @@
-import { ArrowRight, Check, ChevronRight, Instagram, Lock, MessageCircle, Play, ShieldCheck, Target, Users, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight, Instagram, Lock, MessageCircle, Play, ShieldCheck, Sparkles, Target, Users, X } from 'lucide-react';
 import MagnetArt from '../components/MagnetArt';
 import { PlanBuilder, ProductMock, VideoSection, img } from './Entry';
 
@@ -38,8 +38,8 @@ export default function PromoviewHome() {
   return (
     <main className="m-home" lang="nl">
       <section className="m-hero">
-        <span className="m-pill"><Check size={14} aria-hidden /> Sluit je aan bij 500+ bedrijven</span>
-        <h1 className="m-hero-title">Groei je Instagram<br />met AI.</h1>
+        <span className="m-pill"><Sparkles size={14} aria-hidden /> Aangedreven door AI-technologie</span>
+        <h1 className="m-hero-title">Groei je Instagram<br /><span className="pv-grad">met AI.</span></h1>
         <p className="m-hero-lead">Een volger is niks waard zolang het geen potentiële klant is.</p>
         <p className="m-hero-sub">Bereik de juiste mensen, beantwoord elke DM en maak van interesse klanten. Voor ondernemers in Nederland en België.</p>
         <div className="m-ctas">
@@ -49,7 +49,7 @@ export default function PromoviewHome() {
         <ul className="m-reassure" aria-label="Goed om te weten">
           <li><Check size={15} aria-hidden /> Binnen 24 uur live</li>
           <li><Lock size={15} aria-hidden /> Geen wachtwoord nodig</li>
-          <li><Check size={15} aria-hidden /> Nederlands team</li>
+          <li><Check size={15} aria-hidden /> 500+ bedrijven gingen je voor</li>
         </ul>
         <div className="m-hero-stage">
           <img className="m-photo m-photo-a" src={img('man-curly')} alt="" />
@@ -190,7 +190,7 @@ export default function PromoviewHome() {
       </section>
 
       <div className="m-sticky-cta" role="complementary" aria-label="Begin direct">
-        <span><strong>promoview</strong> · binnen 24 uur live</span>
+        <span><strong>Promoview</strong> · binnen 24 uur live</span>
         <a className="btn btn-primary" href="#/onboarding" data-cta="sticky-start">Begin direct</a>
       </div>
     </main>

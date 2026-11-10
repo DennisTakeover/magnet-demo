@@ -1,0 +1,136 @@
+/* Promoview brand (promo-view.io): dark canvas, pink accent, orange→pink gradient, Manrope.
+   Loaded after the generated promoview.css, so these rules win. */
+:root[data-brand=promoview] {
+  --bg: #100f11;
+  --surface: #1a181b;
+  --surface-2: #232025;
+  --mist: #2b282d;
+  --ink: #f6f5f7;
+  --ink-2: #d2ced6;
+  --muted: #9c98a2;
+  --line: #2d2a30;
+  --line-2: #3d3941;
+  --accent: #f8366d;
+  --accent-ink: #e0245a;
+  --accent-soft: rgba(248, 54, 109, 0.14);
+  --accent-soft-2: rgba(248, 54, 109, 0.3);
+  --green: #3ecf8e;
+  --green-soft: rgba(62, 207, 142, 0.14);
+  --amber: #f5b84a;
+  --amber-soft: rgba(245, 184, 74, 0.14);
+  --orange: #fc9a4f;
+  --orange-soft: rgba(252, 154, 79, 0.14);
+  --red: #ff6b6b;
+  --red-soft: rgba(255, 107, 107, 0.14);
+  --blue: #6aa8ff;
+  --blue-soft: rgba(106, 168, 255, 0.14);
+  --violet: #f8366d;
+  --violet-soft: rgba(248, 54, 109, 0.14);
+  --yellow: #fcae2f;
+  --yellow-soft: rgba(252, 174, 47, 0.14);
+  --glass: rgba(26, 24, 27, 0.9);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --pv-grad: linear-gradient(90deg, #fcae2f 0%, #f8366d 55%, #d22d8c 100%);
+  color-scheme: dark;
+}
+html[data-brand=promoview], [data-brand=promoview] body {
+  background:
+    radial-gradient(700px 420px at 100% 100%, rgba(248, 54, 109, 0.16), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 100% 110px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 220px 100%,
+    #100f11;
+  background-attachment: fixed;
+  color: var(--ink);
+}
+[data-brand=promoview] .m-site::before, [data-brand=promoview] .m-home::before { display: none; }
+[data-brand=promoview] h1, [data-brand=promoview] .m-hero-title, [data-brand=promoview] .m-h2 { font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
+[data-brand=promoview] .m-hero-title { font-size: clamp(42px, 6.4vw, 92px); background: linear-gradient(180deg, #fff 30%, #a9a6ad 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+[data-brand=promoview] .pv-grad { background: var(--pv-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+[data-brand=promoview] .m-final-band .m-hero-title { background: none; color: #fff; }
+[data-brand=promoview] .metric-value, [data-brand=promoview] .ov-big, [data-brand=promoview] h2 { font-weight: 800; letter-spacing: -0.03em; }
+[data-brand=promoview] input, [data-brand=promoview] textarea, [data-brand=promoview] select { background: var(--surface-2); color: var(--ink); border-color: var(--line-2); }
+[data-brand=promoview] ::placeholder { color: #7d7983; }
+
+/* Logo: capitalised wordmark with the two gradient strokes */
+[data-brand=promoview] .wordmark, [data-brand=promoview] .m-logo { text-transform: none; font-weight: 800; letter-spacing: -0.02em; color: #fff; display: inline-flex; align-items: center; gap: 0.38em; }
+[data-brand=promoview] .wordmark::before, [data-brand=promoview] .m-logo::before { content: ''; width: 0.72em; height: 0.72em; flex: none; background: linear-gradient(110deg, #fcae2f, #f8366d 60%, #d22d8c); -webkit-mask: linear-gradient(#000 0 0) 0 0 / 38% 100% no-repeat, linear-gradient(#000 0 0) 100% 0 / 38% 78% no-repeat; mask: linear-gradient(#000 0 0) 0 0 / 38% 100% no-repeat, linear-gradient(#000 0 0) 100% 0 / 38% 78% no-repeat; transform: skewX(-16deg); border-radius: 3px; }
+[data-brand=promoview] .sidebar-logo .wordmark { font-size: 24px !important; }
+[data-brand=promoview] .m-logo { font-size: 24px; }
+
+/* Controls: squarer, pink */
+[data-brand=promoview] .btn { border-radius: 8px; font-weight: 600; }
+[data-brand=promoview] .btn-primary, [data-brand=promoview] .btn-dark { background: var(--accent); color: #fff; box-shadow: none; }
+[data-brand=promoview] .btn-primary:hover:not(:disabled), [data-brand=promoview] .btn-dark:hover { background: var(--accent-ink); }
+[data-brand=promoview] .btn-secondary, [data-brand=promoview] .m-ctas .btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+[data-brand=promoview] .btn-secondary:hover:not(:disabled) { background: var(--accent-soft); }
+[data-brand=promoview] .btn-ghost { color: var(--ink-2); }
+[data-brand=promoview] .btn-ghost:hover:not(:disabled) { background: var(--surface-2); }
+[data-brand=promoview] .btn-white { background: #fff; color: #100f11; }
+[data-brand=promoview] .switch::after { background: #fff; }
+[data-brand=promoview] .tabs button, [data-brand=promoview] .segmented button, [data-brand=promoview] .nav-link, [data-brand=promoview] .m-nav-links a, [data-brand=promoview] .m-nav-login { border-radius: 8px; color: var(--ink-2); }
+[data-brand=promoview] .nav-link svg { color: var(--ink-2); }
+[data-brand=promoview] .nav-link.active, [data-brand=promoview] .nav-link.active svg, [data-brand=promoview] .m-nav-links a.on { color: #fff; }
+[data-brand=promoview] .nav-link.active, [data-brand=promoview] .m-nav-links a.on { background: var(--accent-soft); }
+[data-brand=promoview] .nav-link:hover, [data-brand=promoview] .m-nav-links a:hover, [data-brand=promoview] .m-nav-login:hover { background: var(--surface-2); }
+[data-brand=promoview] .segmented, [data-brand=promoview] .tab-pills { border-radius: 10px; background: var(--surface-2); border-color: var(--line); }
+
+/* Surfaces */
+[data-brand=promoview] .m-nav { background: rgba(22, 20, 23, 0.85); border-color: var(--line); border-radius: 14px; box-shadow: none; }
+[data-brand=promoview] .sidebar { background: #151316; border-color: var(--line); border-radius: 18px; box-shadow: none; }
+[data-brand=promoview] .card, [data-brand=promoview] .panel, [data-brand=promoview] .metric, [data-brand=promoview] .modal { background: var(--surface); border-color: var(--line); box-shadow: none; backdrop-filter: none; }
+[data-brand=promoview] .modal-backdrop { background: rgba(0, 0, 0, 0.65); }
+[data-brand=promoview] .m-pill { background: var(--surface); border-color: var(--line-2); color: var(--ink); box-shadow: none; }
+[data-brand=promoview] .m-pill svg { color: var(--accent); }
+[data-brand=promoview] .m-trust, [data-brand=promoview] .m-feature, [data-brand=promoview] .m-pain, [data-brand=promoview] .m-tile, [data-brand=promoview] .lfaq-item, [data-brand=promoview] .tp-card, [data-brand=promoview] .pv-compare, [data-brand=promoview] .m-mock, [data-brand=promoview] .m-builder, [data-brand=promoview] .m-split > div { background: var(--surface); border-color: var(--line); box-shadow: none; }
+[data-brand=promoview] .m-mock-inbox, [data-brand=promoview] .m-mock-ov, [data-brand=promoview] .m-builder-list, [data-brand=promoview] .m-selection { background: var(--surface-2); border-color: var(--line); }
+[data-brand=promoview] .m-mock-tiles .blue, [data-brand=promoview] .m-mock-tiles .yellow { background: var(--mist); }
+[data-brand=promoview] .magnet-art, [data-brand=promoview] .m-photo-a, [data-brand=promoview] .m-photo-b, [data-brand=promoview] .m-photo-c { display: none; }
+[data-brand=promoview] .m-photo { border-color: var(--line-2); }
+[data-brand=promoview] .m-vsl-frame { border-color: var(--line-2); box-shadow: 0 40px 90px rgba(248, 54, 109, 0.12); }
+[data-brand=promoview] .m-vsl-poster { background: radial-gradient(520px 320px at 85% 100%, rgba(248, 54, 109, 0.28), transparent 70%), radial-gradient(420px 260px at 10% 0%, rgba(252, 174, 47, 0.16), transparent 70%), #161417; }
+[data-brand=promoview] .m-vsl-caption { color: var(--ink); }
+[data-brand=promoview] .m-vsl-play, [data-brand=promoview] .tc-fab { box-shadow: 0 16px 40px rgba(248, 54, 109, 0.4); }
+[data-brand=promoview] .m-final-band, [data-brand=promoview] .m-plan.featured { background: radial-gradient(600px 320px at 100% 100%, rgba(248, 54, 109, 0.45), transparent 70%), radial-gradient(500px 260px at 0% 0%, rgba(252, 174, 47, 0.22), transparent 70%), #1a181b; border: 1px solid var(--line-2); box-shadow: none; }
+[data-brand=promoview] .pv-case, [data-brand=promoview] .pv-case:nth-child(n) { background: var(--surface); border-color: var(--line); box-shadow: none; }
+[data-brand=promoview] .pv-case-result { background: var(--pv-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+[data-brand=promoview] .m-icon, [data-brand=promoview] .m-icon.tone-1, [data-brand=promoview] .m-icon.tone-3, [data-brand=promoview] .ov-tile-icon { background: var(--accent-soft); color: var(--accent); }
+[data-brand=promoview] .m-kicker, [data-brand=promoview] .m-step-n { color: var(--accent); }
+[data-brand=promoview] .tp-brand { color: #fff; }
+[data-brand=promoview] .tp-card .tp-avatar { background: var(--mist); color: var(--ink); }
+[data-brand=promoview] .pv-compare td:nth-child(2) { background: rgba(62, 207, 142, 0.08); }
+
+/* App: tiles and charts in brand colours */
+[data-brand=promoview] .content > .metric-grid > .metric:nth-child(n), [data-brand=promoview] .ov-tile.tone-lavender, [data-brand=promoview] .ov-tile.tone-blue, [data-brand=promoview] .ov-tile.tone-yellow, [data-brand=promoview] .ov-tile.tone-mint, [data-brand=promoview] .ov-chart-card, [data-brand=promoview] .campaign-card, [data-brand=promoview] .flow-spot, [data-brand=promoview] .earn-hero, [data-brand=promoview] .upgrade-hint { background: var(--surface); }
+[data-brand=promoview] .hbar-fill { background: var(--pv-grad); }
+[data-brand=promoview] .col-bar, [data-brand=promoview] .col:last-child .col-bar { background: linear-gradient(180deg, #f8366d, #d22d8c); }
+[data-brand=promoview] .spark rect, [data-brand=promoview] .ov-tile .spark rect { fill: rgba(248, 54, 109, 0.3); }
+[data-brand=promoview] .spark rect.spark-last, [data-brand=promoview] .ov-tile .spark rect.spark-last { fill: var(--accent); }
+[data-brand=promoview] .trend-line, [data-brand=promoview] .ov-chart-card .trend-line { stroke: #f8366d; }
+[data-brand=promoview] .trend-svg .grid, [data-brand=promoview] .ov-chart-card .trend-svg .grid { stroke: rgba(255, 255, 255, 0.07); }
+[data-brand=promoview] .trend-dot { stroke: var(--surface); }
+[data-brand=promoview] .checklist-bar > span, [data-brand=promoview] .onb-steprow .onb-progress > span { background: var(--pv-grad); }
+[data-brand=promoview] .msg-out .bubble, [data-brand=promoview] .tc-msg.mine, [data-brand=promoview] .chat-msg.you { background: var(--accent); color: #fff; }
+[data-brand=promoview] .ai-draft, [data-brand=promoview] .m-approve-card, [data-brand=promoview] .tc-head { background: var(--surface-2); border-color: var(--line-2); box-shadow: none; }
+[data-brand=promoview] .ai-draft .ai-label, [data-brand=promoview] .m-approve-card .ai-label { background: var(--accent-soft); }
+[data-brand=promoview] .ai-draft textarea { background: transparent; }
+[data-brand=promoview] .conv-item, [data-brand=promoview] .lead-card, [data-brand=promoview] .move, [data-brand=promoview] .action-item, [data-brand=promoview] .accounts-list li, [data-brand=promoview] .cal-post, [data-brand=promoview] .kw-box { color: var(--ink); }
+[data-brand=promoview] .pipe-col, [data-brand=promoview] .cal-day { background: rgba(255, 255, 255, 0.03); border-color: var(--line); }
+[data-brand=promoview] .cal-day.today { background: var(--accent-soft); border-color: var(--accent-soft-2); }
+[data-brand=promoview] .toast { background: #2b282d; color: var(--ink); }
+[data-brand=promoview] .title-badge, [data-brand=promoview] .kw, [data-brand=promoview] .m-yellow-pill { background: var(--yellow-soft); color: var(--yellow); }
+[data-brand=promoview] .acct-menu, [data-brand=promoview] .tc-panel, [data-brand=promoview] .locale-panel, [data-brand=promoview] .demo-panel { background: #1f1c20; border-color: var(--line-2); }
+[data-brand=promoview] .onboarding .onb-card { background: var(--surface); }
+[data-brand=promoview] .topbar, [data-brand=promoview] .bottom-nav, [data-brand=promoview] .m-sticky-cta { background: rgba(22, 20, 23, 0.92); border-color: var(--line); color: var(--ink); }
+[data-brand=promoview] a { color: #ff6f96; }
+[data-brand=promoview] .btn, [data-brand=promoview] a.btn-primary, [data-brand=promoview] a.btn-dark, [data-brand=promoview] a.btn-white { text-decoration: none; }
+[data-brand=promoview] a.btn-primary, [data-brand=promoview] a.btn-dark { color: #fff; }
+[data-brand=promoview] a.btn-white { color: #100f11; }
+[data-brand=promoview] a.nav-link, [data-brand=promoview] a.lead-card, [data-brand=promoview] a.metric, [data-brand=promoview] a.m-feature, [data-brand=promoview] a.recent, [data-brand=promoview] a.conv-item, [data-brand=promoview] a.action-item, [data-brand=promoview] .m-nav-links a, [data-brand=promoview] a.m-nav-login, [data-brand=promoview] a.m-logo, [data-brand=promoview] .m-footer-cols a { color: var(--ink); }
+[data-brand=promoview] a.nav-link, [data-brand=promoview] .m-nav-links a, [data-brand=promoview] a.m-nav-login, [data-brand=promoview] .m-footer-cols a { color: var(--ink-2); }
+[data-brand=promoview] a.btn-secondary { color: var(--accent); }
+[data-brand=promoview] a.btn-ghost { color: var(--ink-2); }
