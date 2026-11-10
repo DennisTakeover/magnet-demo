@@ -18,6 +18,7 @@ export const STRINGS: Record<string, Row> = {
   'nav.partners': ['Partners', 'Partners', 'Partner', 'Partenaires', 'Socios', 'Parceiros', 'Partner'],
   'nav.plans': ['Plans & Offers', 'Plannen & aanbiedingen', 'Pläne & Angebote', 'Offres & tarifs', 'Planes y ofertas', 'Planos e ofertas', 'Piani e offerte'],
   'nav.analytics': ['Analytics', 'Analytics', 'Analytics', 'Analytique', 'Analítica', 'Análises', 'Analisi'],
+  'nav.messages': ['Messages', 'Berichten', 'Nachrichten', 'Messages', 'Mensajes', 'Mensagens', 'Messaggi'],
   'nav.billing': ['Billing', 'Facturatie', 'Abrechnung', 'Facturation', 'Facturación', 'Faturamento', 'Fatturazione'],
   'nav.settings': ['Settings', 'Instellingen', 'Einstellungen', 'Paramètres', 'Ajustes', 'Configurações', 'Impostazioni'],
   'nav.help': ['Help', 'Help', 'Hilfe', 'Aide', 'Ayuda', 'Ajuda', 'Aiuto'],

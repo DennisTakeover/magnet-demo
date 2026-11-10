@@ -399,6 +399,7 @@ export interface State {
   dismissedHints: string[];
   team: TeamMember[];
   accounts: IgAccount[];
+  teamChat: TeamChatMessage[];
   /** Which account the workspace is filtered to ('all' shows everything) */
   activeAccount: string;
   /** Demo: preview the app as this team member (null = owner) */
@@ -626,4 +627,19 @@ export interface IgAccount {
   growth: GrowthConnection;
   connectedAt: number | null;
   primary: boolean;
+}
+
+/* ───────────── Team ↔ client chat (human contact, no AI) ───────────── */
+
+export interface TeamChatMessage {
+  id: string;
+  clientId: string;
+  from: 'team' | 'client';
+  author: string;
+  text: string;
+  time: number;
+  /** A highlighted update from the team (e.g. weekly progress) rather than a normal chat line */
+  update?: boolean;
+  readByClient: boolean;
+  readByTeam: boolean;
 }

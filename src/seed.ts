@@ -84,7 +84,7 @@ export function createSeed(persona: PersonaId = 'coach'): State {
   ];
 
   return {
-    version: 15,
+    version: 16,
     persona,
     onboarded: true,
     business: p.business,
@@ -157,6 +157,15 @@ export function createSeed(persona: PersonaId = 'coach'): State {
       { id: 'acc2', ...SECOND_ACCOUNT[persona], status: 'connected', growth: 'connected', connectedAt: ago(4 * DAY), primary: false },
     ],
     activeAccount: 'all',
+    teamChat: [
+      { id: 'tc1', clientId: 'c1', from: 'team', author: 'Sophie Laurent', text: `Hi ${p.business.owner.split(' ')[0]}, I’m Sophie, your contact at MAGNET. Message me here any time you have a question. I’m a real person, not a bot.`, time: ago(7 * DAY), readByClient: true, readByTeam: true },
+      { id: 'tc2', clientId: 'c1', from: 'client', author: p.business.owner, text: 'Thanks Sophie! Is my audience set up well enough to start?', time: ago(6 * DAY + 2 * HOUR), readByClient: true, readByTeam: true },
+      { id: 'tc3', clientId: 'c1', from: 'team', author: 'Sophie Laurent', text: 'Yes, it looks good. I’d add one or two example accounts when you have a moment, that sharpens who we reach.', time: ago(6 * DAY), readByClient: true, readByTeam: true },
+      { id: 'tc4', clientId: 'c1', from: 'team', author: 'Sophie Laurent', text: `Weekly update: your first Lead Flow is live and conversations are coming in. Tip for this week: reply to new conversations within a day, that’s where most of your leads start.`, time: ago(3 * HOUR), update: true, readByClient: false, readByTeam: true },
+      { id: 'tc5', clientId: 'c2', from: 'client', author: clients[1].owner, text: 'Can you check if my blocked words are set right? I still see some wholesale accounts.', time: ago(5 * HOUR), readByClient: true, readByTeam: false },
+      { id: 'tc6', clientId: 'c3', from: 'team', author: 'Sophie Laurent', text: 'Your campaign is running well this week. Let me know if you want to add a second Lead Flow.', time: ago(2 * DAY), update: true, readByClient: true, readByTeam: true },
+      { id: 'tc7', clientId: 'c4', from: 'team', author: 'Sophie Laurent', text: 'Your Instagram connection dropped after the password change. Could you reconnect in MAGNET? I’ll restart your campaign right after.', time: ago(2 * DAY), readByClient: false, readByTeam: true },
+    ],
     sim: { emptyInbox: false, missingKnowledge: false, slowLoading: false, failNextPublish: false, billingDown: false },
     processedEvents: executions.map((e) => e.eventId),
     plan: { name: p.admin.plan, status: 'Trial', trialEnds: isoDate(9) },

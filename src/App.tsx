@@ -9,6 +9,8 @@ import { t } from './i18n/locale';
 import { setActiveLocale } from './i18n/locale';
 import DemoControls from './components/DemoControls';
 import AccountSwitcher from './components/AccountSwitcher';
+import TeamChatWidget from './components/TeamChat';
+import Messages from './admin/Messages';
 import Entry from './screens/Entry';
 import Onboarding from './screens/Onboarding';
 import Overview from './screens/Overview';
@@ -66,6 +68,7 @@ const ADMIN_NAV = [
   { path: '/admin/operations', tkey: 'nav.operations', icon: Gauge },
   { path: '/admin/clients', tkey: 'nav.clients', icon: Building2 },
   { path: '/admin/activity', tkey: 'nav.activity', icon: ActivityIcon },
+  { path: '/admin/messages', tkey: 'nav.messages', icon: MessageCircle },
   { path: '/admin/support', tkey: 'nav.support', icon: LifeBuoy },
   { path: '/admin/plans', tkey: 'nav.plans', icon: Tags },
   { path: '/admin/partners', tkey: 'nav.partners', icon: Handshake },
@@ -113,6 +116,7 @@ function Shell({ role, path, children }: { role: 'client' | 'admin'; path: strin
   }, [section, state.sim.slowLoading]);
 
   const unread = state.sim.emptyInbox ? 0 : state.conversations.filter((c) => c.unread).length;
+  const chatUnread = state.teamChat.filter((m) => m.from === 'client' && !m.readByTeam).length;
   const nav = role === 'client' ? CLIENT_NAV : ADMIN_NAV;
   const link = (n: (typeof CLIENT_NAV)[number]) => {
     const active = section === n.path || path.startsWith(n.path + '/');
@@ -124,6 +128,7 @@ function Shell({ role, path, children }: { role: 'client' | 'admin'; path: strin
         {GATED[n.path.split('/')[2]] && !entitledModules(state).includes(GATED[n.path.split('/')[2]]) && <Lock size={14} aria-label="Not in your plan" className="nav-lock" />}
         {role === 'client' && deniedReason(state, n.path.split('/')[2]) && <Lock size={14} aria-label="No access" className="nav-lock" />}
         {n.path === '/app/inbox' && unread > 0 && <span className="nav-count" aria-label={`${unread}`}>{unread}</span>}
+        {n.path === '/admin/messages' && chatUnread > 0 && <span className="nav-count" aria-label={`${chatUnread} unread`}>{chatUnread}</span>}
       </a>
     );
   };
@@ -261,6 +266,7 @@ export default function App() {
       case 'clients': page = parts[2] ? <ClientDetail id={parts[2]} /> : <Clients />; break;
       case 'activity': page = <AdminActivity />; break;
       case 'support': page = <Support />; break;
+      case 'messages': page = <Messages clientId={parts[2]} />; break;
       case 'partners': page = <Partners />; break;
       case 'plans': page = <PlansOffers />; break;
       case 'analytics': page = <Analytics />; break;
@@ -281,6 +287,7 @@ export default function App() {
       ) : (
         page
       )}
+      {role === 'client' && <TeamChatWidget />}
       <Toaster />
     </>
   );

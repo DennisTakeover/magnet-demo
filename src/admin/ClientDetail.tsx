@@ -89,6 +89,7 @@ export default function ClientDetail({ id }: { id: string }) {
       <PageHeader
         title={c.name}
         subtitle={<>{c.owner} · {c.handle} · {c.niche}{c.isDemoClient && <> · <a href="#/app/overview">open client view</a></>}</>}
+        actions={<a className="btn btn-primary" href={`#/admin/messages/${c.id}`}>Message {c.owner.split(' ')[0]}</a>}
       />
 
       <div className="grid-2 grid-top">
