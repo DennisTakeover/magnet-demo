@@ -27,6 +27,8 @@ export interface AudiencePersona {
   topic: string;
   postIdea: { title: string; format: 'Reel' | 'Carousel' | 'Post'; caption: string };
   color: string;
+  /** Icon key for the persona avatar */
+  icon: 'briefcase' | 'plane' | 'heart' | 'repeat' | 'search' | 'gift' | 'bike' | 'mountain' | 'baby';
 }
 export interface Recommendation { title: string; body: string; action: 'post' | 'topic' | 'flow' | 'time'; persona?: string }
 
@@ -91,7 +93,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
     ],
     personas: [
       {
-        id: 'p1', name: 'The busy founder', share: 42, age: '30–44', where: 'Amsterdam, London', color: COLORS[0],
+        id: 'p1', name: 'The busy founder', share: 42, age: '30–44', where: 'Amsterdam, London', color: COLORS[0], icon: 'briefcase',
         summary: 'Runs a company, trains when the calendar allows. Wants results without spending an hour a day.',
         cares: ['Short workouts that fit between meetings', 'Energy for long workdays', 'Proof it works for people like them'],
         asks: ['“Does this work with 3 hours a week?”', '“What does the programme cost?”'],
@@ -99,7 +101,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
         postIdea: { title: 'The 20-minute founder workout', format: 'Carousel', caption: 'No time? Five moves, twenty minutes, done before your first call. Save this for tomorrow morning.' },
       },
       {
-        id: 'p2', name: 'The travelling consultant', share: 27, age: '28–40', where: 'London, Berlin', color: COLORS[1],
+        id: 'p2', name: 'The travelling consultant', share: 27, age: '28–40', where: 'London, Berlin', color: COLORS[1], icon: 'plane',
         summary: 'Often on the road for clients. Struggles to stay consistent in hotels and airports.',
         cares: ['Hotel room workouts', 'Eating well on the road', 'Routines that survive a busy week'],
         asks: ['“Can I follow it while travelling?”', '“Do you have a travel version?”'],
@@ -107,7 +109,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
         postIdea: { title: 'Airport-proof routine in 3 steps', format: 'Reel', caption: 'Three things I tell every travelling client. Comment TRAVEL and I’ll send you the full checklist.' },
       },
       {
-        id: 'p3', name: 'The restarting parent', share: 19, age: '35–49', where: 'Rotterdam, Utrecht', color: COLORS[2],
+        id: 'p3', name: 'The restarting parent', share: 19, age: '35–49', where: 'Rotterdam, Utrecht', color: COLORS[2], icon: 'heart',
         summary: 'Wants to get fit again after a few busy years. Needs encouragement and a realistic start.',
         cares: ['A gentle, realistic start', 'Stories from people who did it', 'Workouts at home'],
         asks: ['“Is it okay to start from zero?”', '“How soon will I notice a difference?”'],
@@ -159,7 +161,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
     ],
     personas: [
       {
-        id: 'p1', name: 'The routine builder', share: 46, age: '25–34', where: 'Amsterdam, Rotterdam', color: COLORS[0],
+        id: 'p1', name: 'The routine builder', share: 46, age: '25–34', where: 'Amsterdam, Rotterdam', color: COLORS[0], icon: 'repeat',
         summary: 'Wants a simple routine that works. Buys once she trusts it suits her skin type.',
         cares: ['Simple 3-step routines', 'Which product for which skin type', 'Real results over time'],
         asks: ['“Which serum fits dry skin?”', '“Can I combine these two?”'],
@@ -167,7 +169,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
         postIdea: { title: 'Evening routine for dry skin', format: 'Reel', caption: 'Three steps, two minutes. Comment ROUTINE and I’ll send you the full guide for your skin type.' },
       },
       {
-        id: 'p2', name: 'The ingredient checker', share: 31, age: '22–34', where: 'Antwerp, Ghent', color: COLORS[1],
+        id: 'p2', name: 'The ingredient checker', share: 31, age: '22–34', where: 'Antwerp, Ghent', color: COLORS[1], icon: 'search',
         summary: 'Reads every label. Values clear explanations and honest claims.',
         cares: ['What each ingredient does', 'Clean, honest claims', 'Comparisons between products'],
         asks: ['“Is this fragrance-free?”', '“What percentage of niacinamide?”'],
@@ -175,7 +177,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
         postIdea: { title: 'Retinol: what it does and doesn’t do', format: 'Carousel', caption: 'Save this before you buy your next serum.' },
       },
       {
-        id: 'p3', name: 'The gift shopper', share: 15, age: '30–49', where: 'The Hague, Utrecht', color: COLORS[2],
+        id: 'p3', name: 'The gift shopper', share: 15, age: '30–49', where: 'The Hague, Utrecht', color: COLORS[2], icon: 'gift',
         summary: 'Looks for a thoughtful gift. Decides quickly when the price and packaging are clear.',
         cares: ['Gift sets with clear prices', 'Nice packaging', 'Fast delivery'],
         asks: ['“Can you gift-wrap it?”', '“Will it arrive before Friday?”'],
@@ -227,7 +229,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
     ],
     personas: [
       {
-        id: 'p1', name: 'The daily commuter', share: 48, age: '25–44', where: 'Utrecht', color: COLORS[0],
+        id: 'p1', name: 'The daily commuter', share: 48, age: '25–44', where: 'Utrecht', color: COLORS[0], icon: 'bike',
         summary: 'Rides to work every day. Needs the bike to just work and hates losing a day to repairs.',
         cares: ['Fast repairs', 'Booking a slot easily', 'Keeping the bike reliable in winter'],
         asks: ['“Can you fix it today?”', '“What does a service cost?”'],
@@ -235,7 +237,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
         postIdea: { title: '3 checks before your winter commute', format: 'Carousel', caption: 'Lights, brakes, tyres. Comment SERVICE to book a winter check-up.' },
       },
       {
-        id: 'p2', name: 'The weekend rider', share: 29, age: '35–54', where: 'Utrecht, Zeist', color: COLORS[1],
+        id: 'p2', name: 'The weekend rider', share: 29, age: '35–54', where: 'Utrecht, Zeist', color: COLORS[1], icon: 'mountain',
         summary: 'Rides for fun and fitness. Interested in upgrades, e-bikes and routes.',
         cares: ['E-bikes and upgrades', 'Local routes', 'Advice from enthusiasts'],
         asks: ['“Can I test-ride this e-bike?”', '“Which model for longer rides?”'],
@@ -243,7 +245,7 @@ export const INSIGHTS: Record<PersonaId, AudienceInsights> = {
         postIdea: { title: 'Test-ride our new e-bikes this Saturday', format: 'Reel', caption: 'Three models, one morning. Book your test ride in the DMs.' },
       },
       {
-        id: 'p3', name: 'The family with kids’ bikes', share: 16, age: '30–44', where: 'Houten, Nieuwegein', color: COLORS[2],
+        id: 'p3', name: 'The family with kids’ bikes', share: 16, age: '30–44', where: 'Houten, Nieuwegein', color: COLORS[2], icon: 'baby',
         summary: 'Buys and maintains bikes for the whole family. Practical and price-aware.',
         cares: ['Kids’ bikes that grow along', 'Clear prices', 'A trade-in option'],
         asks: ['“Do you take old bikes in?”', '“Which size for a 7-year-old?”'],

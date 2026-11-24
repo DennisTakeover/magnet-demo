@@ -1,25 +1,60 @@
-import { Fragment, useState } from 'react';
-import { CalendarPlus, Clock, Info, Lightbulb, MapPin, MessageCircle, Plus, ShieldCheck, Sparkles, Target, TrendingUp, Users, Workflow } from 'lucide-react';
+import { Fragment, useState, type ReactNode } from 'react';
+import {
+  Baby, Bike, Bookmark, Briefcase, CalendarPlus, ChevronDown, Clock, Eye, Film, Gift, GalleryHorizontal, Heart, Image as ImageIcon,
+  Lightbulb, MapPin, MessageCircle, Mountain, Plane, Plus, Repeat, ScanSearch, ShieldCheck, Sparkles, Star, Target, TrendingUp, Trophy,
+  Users, Workflow, type LucideIcon,
+} from 'lucide-react';
 import { clientLog, navigate, uid, useStore } from '../store';
-import { Badge, PageHeader } from '../components/ui';
-import { DAYS, INSIGHTS, SLOTS, type AudiencePersona, type Recommendation } from '../insights';
+import { PageHeader } from '../components/ui';
+import { DAYS, INSIGHTS, SLOTS, type AudiencePersona, type FormatStat, type Recommendation } from '../insights';
 
-const pct = (v: number) => `${v}%`;
-const fmtNum = (v: number) => v.toLocaleString('en-GB');
+const PERSONA_ICON: Record<AudiencePersona['icon'], LucideIcon> = {
+  briefcase: Briefcase, plane: Plane, heart: Heart, repeat: Repeat, search: ScanSearch, gift: Gift, bike: Bike, mountain: Mountain, baby: Baby,
+};
+const FORMAT_ICON: Record<FormatStat['format'], LucideIcon> = { Reel: Film, Carousel: GalleryHorizontal, Post: ImageIcon, Story: Sparkles };
+const FLAG: Record<string, string> = { Netherlands: '🇳🇱', Belgium: '🇧🇪', Germany: '🇩🇪', France: '🇫🇷', 'United Kingdom': '🇬🇧', Other: '🌍' };
+/** Series colours come from CSS so each brand gets its own validated palette. */
+const C = ['var(--au-c1)', 'var(--au-c2)', 'var(--au-c3)'];
+const fmt = (v: number) => (v >= 10000 ? `${(v / 1000).toFixed(1).replace('.0', '')}k` : v.toLocaleString('en-GB'));
 
-/**
- * Audience insights: who the audience is, what works, and AI personas.
- * Built from aggregated Instagram Insights plus MAGNET's own results. No individual profiling.
- */
+/** SVG donut. Segments keep a small surface gap. */
+export function Donut({ parts, size = 132, stroke = 16, children }: { parts: { value: number; color: string; label: string }[]; size?: number; stroke?: number; children?: ReactNode }) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  let offset = 0;
+  return (
+    <div className="au-donut" style={{ width: size, height: size }}>
+      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} role="img" aria-label={parts.map((p) => `${p.label} ${p.value}%`).join(', ')}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--au-track)" strokeWidth={stroke} />
+        {parts.map((p) => {
+          const len = (p.value / 100) * circ;
+          const seg = (
+            <circle key={p.label} cx={size / 2} cy={size / 2} r={r} fill="none" stroke={p.color} strokeWidth={stroke}
+              strokeDasharray={`${Math.max(len - 3, 0)} ${circ}`} strokeDashoffset={-offset} transform={`rotate(-90 ${size / 2} ${size / 2})`}>
+              <title>{`${p.label}: ${p.value}%`}</title>
+            </circle>
+          );
+          offset += len;
+          return seg;
+        })}
+      </svg>
+      <div className="au-donut-center">{children}</div>
+    </div>
+  );
+}
+
 export default function Audience() {
   const { state, update, toast } = useStore();
   const data = INSIGHTS[state.persona];
-  const [open, setOpen] = useState<string | null>(data.personas[0].id);
+  const [open, setOpen] = useState<string | null>(null);
   const maxAge = Math.max(...data.ages.flatMap((a) => [a.women, a.men]));
   const women = data.ages.reduce((t, a) => t + a.women, 0);
   const men = data.ages.reduce((t, a) => t + a.men, 0);
   const flat = data.activity.flatMap((row, d) => row.map((v, s) => ({ v, d, s })));
   const best = [...flat].sort((a, b) => b.v - a.v).slice(0, 2);
+  const isBest = (d: number, s: number) => best.some((b) => b.d === d && b.s === s);
+  const topFormat = [...data.formats].sort((a, b) => b.reach + b.saves + b.dms - (a.reach + a.saves + a.dms))[0].format;
+  const other = 100 - data.personas.reduce((t, p) => t + p.share, 0);
 
   const planPost = (p: AudiencePersona) => {
     update((d) => {
@@ -48,106 +83,130 @@ export default function Audience() {
     navigate('/app/planner');
   };
 
+  const kpis: [LucideIcon, string, string][] = [
+    [Users, fmt(data.followers), 'Followers'],
+    [TrendingUp, fmt(data.reach28), 'Reached · 28 days'],
+    [Sparkles, `${data.engagementRate}%`, 'Engagement'],
+    [Target, `${data.matchShare}%`, 'Fit your target'],
+  ];
+
   return (
-    <>
-      <PageHeader
-        title="Know your audience."
-        subtitle="Who follows you, what they respond to, and the groups of people behind the numbers."
-        actions={<span className="chip-static">Last 28 days</span>}
-      />
+    <div className="au">
+      <PageHeader title="Know your audience." subtitle="Who they are, when they’re online and what makes them act." actions={<span className="chip-static">Last 28 days</span>} />
 
-      <div className="metric-grid">
-        <div className="metric"><span className="metric-top"><Users size={18} className="metric-icon" aria-hidden /><span className="metric-label">Followers</span></span><span className="metric-value">{fmtNum(data.followers)}</span><span className="metric-def">Across your connected account</span></div>
-        <div className="metric"><span className="metric-top"><TrendingUp size={18} className="metric-icon" aria-hidden /><span className="metric-label">Accounts reached</span></span><span className="metric-value">{fmtNum(data.reach28)}</span><span className="metric-def">Unique accounts, last 28 days</span></div>
-        <div className="metric"><span className="metric-top"><Sparkles size={18} className="metric-icon" aria-hidden /><span className="metric-label">Engagement rate</span></span><span className="metric-value">{data.engagementRate}%</span><span className="metric-def">Likes, comments, saves and shares per reach</span></div>
-        <div className="metric"><span className="metric-top"><Target size={18} className="metric-icon" aria-hidden /><span className="metric-label">Matches your target</span></span><span className="metric-value">{data.matchShare}%</span><span className="metric-def">Of new followers fit your Grow audience</span></div>
-      </div>
-
-      <section className="card au-personas" aria-labelledby="au-p">
-        <div className="card-head">
-          <h2 id="au-p"><Sparkles size={18} aria-hidden /> Your audience personas</h2>
-          <Badge tone="accent">AI estimate</Badge>
-        </div>
-        <p className="muted small">Groups of followers who behave alike, based on what they engage with and ask you. They describe groups, not individual people.</p>
-        <div className="au-share" aria-label="Share of your audience per persona">
-          {data.personas.map((p) => <span key={p.id} style={{ width: `${p.share}%`, background: p.color }} title={`${p.name}: ${p.share}%`} />)}
-          <span className="rest" style={{ width: `${100 - data.personas.reduce((t, p) => t + p.share, 0)}%` }} title="Other" />
-        </div>
-        <div className="au-persona-grid">
-          {data.personas.map((p) => (
-            <article key={p.id} className={`au-persona ${open === p.id ? 'open' : ''}`}>
-              <div className="au-persona-head">
-                <span className="au-dot" style={{ background: p.color }} aria-hidden />
-                <div>
-                  <strong>{p.name}</strong>
-                  <span className="muted small">{p.share}% of your audience · {p.age} · {p.where}</span>
-                </div>
-              </div>
-              <p className="small">{p.summary}</p>
-              <dl className="au-facts">
-                <div><dt><Lightbulb size={14} aria-hidden /> Best content</dt><dd>{p.bestContent}</dd></div>
-                <div><dt><Clock size={14} aria-hidden /> Most active</dt><dd>{p.bestTime}</dd></div>
-              </dl>
-              {open === p.id ? (
-                <>
-                  <h3 className="au-sub">What they care about</h3>
-                  <ul className="au-list">{p.cares.map((c) => <li key={c}>{c}</li>)}</ul>
-                  <h3 className="au-sub"><MessageCircle size={14} aria-hidden /> What they ask you</h3>
-                  <ul className="au-list quotes">{p.asks.map((c) => <li key={c}>{c}</li>)}</ul>
-                </>
-              ) : (
-                <button className="link-btn" onClick={() => setOpen(p.id)}>Show details</button>
-              )}
-              <div className="row gap-sm wrap au-actions">
-                <button className="btn btn-sm btn-primary" onClick={() => planPost(p)}><CalendarPlus size={14} /> Plan a post for them</button>
-                <button className="btn btn-sm btn-secondary" onClick={() => addTopic(p.topic)}><Plus size={14} /> Add “{p.topic}” to Grow</button>
-              </div>
-            </article>
+      <section className="card au-hero" aria-label="Audience at a glance">
+        <Donut parts={[...data.personas.map((p, i) => ({ value: p.share, color: C[i], label: p.name })), { value: other, color: 'var(--au-other)', label: 'Other' }]} size={168} stroke={20}>
+          <strong>3</strong><span>personas</span>
+        </Donut>
+        <ul className="au-hero-legend">
+          {data.personas.map((p, i) => {
+            const Icon = PERSONA_ICON[p.icon];
+            return (
+              <li key={p.id}>
+                <span className="au-avatar sm" style={{ ['--c' as string]: C[i] }}><Icon size={16} aria-hidden /></span>
+                <span className="au-hero-name">{p.name}</span>
+                <strong>{p.share}%</strong>
+              </li>
+            );
+          })}
+          <li className="other"><span className="au-avatar sm" style={{ ['--c' as string]: 'var(--au-other)' }} /><span className="au-hero-name">Other</span><strong>{other}%</strong></li>
+        </ul>
+        <div className="au-kpis">
+          {kpis.map(([Icon, value, label]) => (
+            <div key={label} className="au-kpi"><Icon size={18} aria-hidden /><strong>{value}</strong><span>{label}</span></div>
           ))}
         </div>
       </section>
 
+      <div className="au-persona-grid">
+        {data.personas.map((p, i) => {
+          const Icon = PERSONA_ICON[p.icon];
+          const expanded = open === p.id;
+          return (
+            <article key={p.id} className="au-persona" style={{ ['--c' as string]: C[i] }}>
+              <div className="au-persona-top">
+                <span className="au-avatar"><Icon size={26} aria-hidden /></span>
+                <span className="au-persona-share"><strong>{p.share}%</strong><span>of audience</span></span>
+              </div>
+              <h2>{p.name}</h2>
+              <div className="au-tags">
+                <span><Users size={13} aria-hidden /> {p.age}</span>
+                <span><MapPin size={13} aria-hidden /> {p.where.split(',')[0]}</span>
+              </div>
+              <div className="au-tiles">
+                <div><Lightbulb size={16} aria-hidden /><span>{p.bestContent}</span></div>
+                <div><Clock size={16} aria-hidden /><span>{p.bestTime}</span></div>
+              </div>
+              <div className="au-cares">{p.cares.map((c) => <span key={c}>{c}</span>)}</div>
+              <div className="au-bubble" aria-label="Typical question in your DMs"><MessageCircle size={14} aria-hidden /> {p.asks[0]}</div>
+              {expanded && (
+                <div className="au-more">
+                  <p>{p.summary}</p>
+                  {p.asks.slice(1).map((a) => <div key={a} className="au-bubble"><MessageCircle size={14} aria-hidden /> {a}</div>)}
+                </div>
+              )}
+              <button className="au-toggle" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : p.id)}>
+                {expanded ? 'Less' : 'More about them'} <ChevronDown size={14} aria-hidden />
+              </button>
+              <div className="au-persona-actions">
+                <button className="btn btn-sm btn-primary" onClick={() => planPost(p)}><CalendarPlus size={14} /> Plan a post for them</button>
+                <button className="btn btn-sm btn-secondary" onClick={() => addTopic(p.topic)} title={`Add “${p.topic}” to your Grow topics`}><Plus size={14} /> Add “{p.topic}” to Grow</button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
       <div className="au-grid">
         <section className="card" aria-labelledby="au-age">
           <div className="card-head">
-            <h2 id="au-age">Age and gender</h2>
-            <span className="au-legend"><i className="w" /> Women {women}% <i className="m" /> Men {men}%</span>
+            <h2 id="au-age">Age & gender</h2>
+            <span className="au-legend"><i style={{ background: C[0] }} /> Women <i style={{ background: C[1] }} /> Men</span>
           </div>
-          <div className="au-ages" role="table" aria-label="Followers by age and gender">
-            {data.ages.map((a) => (
-              <div key={a.band} className="au-age" role="row">
-                <span className="au-age-label" role="rowheader">{a.band}</span>
-                <span className="au-bars" role="cell">
-                  <span className="w" style={{ width: `${(a.women / maxAge) * 100}%` }} title={`${a.band}, women: ${a.women}%`}><em>{a.women}%</em></span>
-                  <span className="m" style={{ width: `${(a.men / maxAge) * 100}%` }} title={`${a.band}, men: ${a.men}%`}><em>{a.men}%</em></span>
-                </span>
-              </div>
-            ))}
+          <div className="au-agewrap">
+            <div className="au-cols" role="table" aria-label="Followers by age and gender">
+              {data.ages.map((a) => (
+                <div key={a.band} className="au-col" role="row">
+                  <div className="au-col-bars">
+                    <span role="cell" style={{ height: `${(a.women / maxAge) * 100}%`, background: C[0] }} title={`${a.band}, women: ${a.women}%`} />
+                    <span role="cell" style={{ height: `${(a.men / maxAge) * 100}%`, background: C[1] }} title={`${a.band}, men: ${a.men}%`} />
+                  </div>
+                  <span className="au-col-label" role="rowheader">{a.band}</span>
+                </div>
+              ))}
+            </div>
+            <Donut parts={[{ value: women, color: C[0], label: 'Women' }, { value: men, color: C[1], label: 'Men' }]} size={112} stroke={14}>
+              <strong>{women}%</strong><span>women</span>
+            </Donut>
           </div>
-          <p className="muted xsmall">Share of followers. Instagram shows these groups only; people who didn’t share an age or gender aren’t counted.</p>
         </section>
 
         <section className="card" aria-labelledby="au-loc">
-          <h2 id="au-loc"><MapPin size={18} aria-hidden /> Where they are</h2>
-          <h3 className="au-sub">Top cities</h3>
-          <ul className="hbars">
+          <h2 id="au-loc">Where they live</h2>
+          <div className="au-flags">
+            {data.countries.map((c) => (
+              <div key={c.name} title={`${c.name}: ${c.share}%`}><span className="au-flag" aria-hidden>{FLAG[c.name] ?? '🌍'}</span><strong>{c.share}%</strong><span>{c.name}</span></div>
+            ))}
+          </div>
+          <ul className="au-cities">
             {data.cities.map((c) => (
               <li key={c.name} title={`${c.name}: ${c.share}%`}>
-                <span className="hbar-label">{c.name}</span>
-                <span className="hbar-track"><span className="hbar-fill" style={{ width: `${(c.share / data.cities[0].share) * 100}%` }} /></span>
-                <span className="hbar-value">{pct(c.share)}</span>
+                <MapPin size={14} aria-hidden />
+                <span className="au-city">{c.name}</span>
+                <span className="au-track"><span style={{ width: `${(c.share / data.cities[0].share) * 100}%` }} /></span>
+                <strong>{c.share}%</strong>
               </li>
             ))}
           </ul>
-          <h3 className="au-sub">Top countries</h3>
-          <div className="au-chips">{data.countries.map((c) => <span key={c.name} className="chip-static">{c.name} · {c.share}%</span>)}</div>
         </section>
       </div>
 
       <section className="card" aria-labelledby="au-time">
         <div className="card-head">
-          <h2 id="au-time"><Clock size={18} aria-hidden /> When they’re online</h2>
-          <span className="small">Best moments: <strong>{DAYS[best[0].d]} {SLOTS[best[0].s]}</strong> and <strong>{DAYS[best[1].d]} {SLOTS[best[1].s]}</strong></span>
+          <h2 id="au-time">When they’re online</h2>
+          <div className="au-besttime">
+            {best.map((b) => <span key={`${b.d}-${b.s}`}><Star size={14} aria-hidden /> {DAYS[b.d]} {SLOTS[b.s]}</span>)}
+          </div>
         </div>
         <div className="au-heat" role="table" aria-label="Follower activity by day and time">
           <span />
@@ -156,89 +215,102 @@ export default function Audience() {
             <Fragment key={DAYS[d]}>
               <span className="au-heat-h left" role="rowheader">{DAYS[d]}</span>
               {row.map((v, s) => (
-                <span key={s} role="cell" className="au-cell" style={{ ['--a' as string]: (0.08 + (v / 100) * 0.92).toFixed(2) }} title={`${DAYS[d]} ${SLOTS[s]}: ${v}% of peak activity`} aria-label={`${DAYS[d]} ${SLOTS[s]}: ${v}% of peak`} />
+                <span key={s} role="cell" className={`au-cell ${isBest(d, s) ? 'best' : ''}`} style={{ ['--a' as string]: (0.1 + (v / 100) * 0.9).toFixed(2) }}
+                  title={`${DAYS[d]} ${SLOTS[s]}: ${v}% of peak`} aria-label={`${DAYS[d]} ${SLOTS[s]}: ${v}% of peak`}>
+                  {isBest(d, s) && <Star size={14} aria-hidden />}
+                </span>
               ))}
             </Fragment>
           ))}
         </div>
-        <p className="muted xsmall">Darker means more of your followers are online. Relative to your busiest moment.</p>
+        <div className="au-scale" aria-hidden><span>Quiet</span><i /><span>Busy</span></div>
+      </section>
+
+      <section className="card" aria-labelledby="au-fmt">
+        <div className="card-head">
+          <h2 id="au-fmt">Which formats work</h2>
+          <span className="au-legend"><Eye size={14} aria-hidden /> Reach <Bookmark size={14} aria-hidden /> Saves <MessageCircle size={14} aria-hidden /> DMs</span>
+        </div>
+        <div className="au-formats">
+          {data.formats.map((f) => {
+            const Icon = FORMAT_ICON[f.format];
+            const win = f.format === topFormat;
+            const rows: [LucideIcon, string, number | null][] = [[Eye, 'Reach', f.reach], [Bookmark, 'Saves', f.format === 'Story' ? null : f.saves], [MessageCircle, 'DMs', f.dms]];
+            return (
+              <div key={f.format} className={`au-format ${win ? 'win' : ''}`}>
+                {win && <span className="au-win"><Trophy size={12} aria-hidden /> Best</span>}
+                <span className="au-format-icon"><Icon size={22} aria-hidden /></span>
+                <strong>{f.format}</strong>
+                {rows.map(([RIcon, label, v]) => (
+                  <div key={label} className="au-meter" title={v === null ? `${label}: not available` : `${label}: ${v} (best = 100)`}>
+                    <RIcon size={13} aria-label={label} />
+                    <span className="au-track"><span style={{ width: `${v ?? 0}%` }} /></span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       <div className="au-grid">
-        <section className="card" aria-labelledby="au-fmt">
-          <h2 id="au-fmt">What works: formats</h2>
-          <div className="au-table-wrap"><table className="table au-table">
-            <thead><tr><th scope="col">Format</th><th scope="col">Reach</th><th scope="col">Saves</th><th scope="col">Starts DMs</th></tr></thead>
-            <tbody>
-              {data.formats.map((f) => (
-                <tr key={f.format}>
-                  <th scope="row">{f.format}</th>
-                  {[f.reach, f.saves, f.dms].map((v, i) => (
-                    <td key={i}>{f.format === 'Story' && i === 1 ? <span className="muted xsmall">n/a</span> : <span className={`au-mini ${v === 100 ? 'best' : ''}`} title={v === 100 ? 'Best' : `${v}`}><span style={{ width: `${v}%` }} /></span>}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table></div>
-          <p className="muted xsmall">Compared with your best format per column (= 100). Green = best.</p>
-        </section>
-
         <section className="card" aria-labelledby="au-top">
           <div className="card-head">
-            <h2 id="au-top">What works: topics</h2>
-            <span className="au-legend"><i className="eng" /> Engagement <i className="lead" /> Leads</span>
+            <h2 id="au-top">Which topics work</h2>
+            <span className="au-legend"><i style={{ background: C[0] }} /> Engagement <i style={{ background: C[2] }} /> Leads</span>
           </div>
           <div className="au-topics">
             {data.topics.map((t) => (
               <div key={t.topic} className="au-topic" title={`${t.topic}: engagement ${t.engagement}, leads ${t.leads} (best = 100)`}>
                 <span className="au-topic-label">{t.topic}</span>
                 <span className="au-pair">
-                  <span className="eng" style={{ width: `${t.engagement}%` }} />
-                  <span className="lead" style={{ width: `${t.leads}%` }} />
+                  <span style={{ width: `${t.engagement}%`, background: C[0] }} />
+                  <span style={{ width: `${t.leads}%`, background: C[2] }} />
                 </span>
               </div>
             ))}
           </div>
-          <p className="muted xsmall">Leads = conversations that reached Qualified. Compared with your best topic (= 100).</p>
         </section>
-      </div>
 
-      <div className="au-grid">
         <section className="card" aria-labelledby="au-posts">
           <h2 id="au-posts">Top posts</h2>
-          <ul className="au-posts">
-            {data.topPosts.map((p, i) => (
-              <li key={p.title}>
-                <span className="au-rank">{i + 1}</span>
-                <div><strong>{p.title}</strong><span className="muted xsmall">{p.format}</span></div>
-                <dl>
-                  <div><dt>Reach</dt><dd>{fmtNum(p.reach)}</dd></div>
-                  <div><dt>Saves</dt><dd>{fmtNum(p.saves)}</dd></div>
-                  <div><dt>Conversations</dt><dd>{p.conversations}</dd></div>
-                </dl>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="card au-recs" aria-labelledby="au-recs">
-          <h2 id="au-recs"><Lightbulb size={18} aria-hidden /> What to do next</h2>
-          <ul>
-            {data.recommendations.map((r) => (
-              <li key={r.title}>
-                <span className="au-rec-icon" aria-hidden>{r.action === 'flow' ? <Workflow size={18} /> : r.action === 'topic' ? <Target size={18} /> : <Clock size={18} />}</span>
-                <div>
-                  <strong>{r.title}</strong>
-                  <p className="small muted">{r.body}</p>
-                  <button className="btn btn-sm btn-soft" onClick={() => runRec(r)}>{r.action === 'flow' ? 'Create Lead Flow' : r.action === 'topic' ? 'Add to Grow' : 'Open Planner'}</button>
+          <div className="au-posts">
+            {data.topPosts.map((p, i) => {
+              const Icon = FORMAT_ICON[p.format];
+              return (
+                <div key={p.title} className={`au-post g${i}`}>
+                  <span className="au-post-rank">#{i + 1}</span>
+                  <Icon size={16} className="au-post-format" aria-label={p.format} />
+                  <strong>{p.title}</strong>
+                  <div className="au-post-stats">
+                    <span title="Reach"><Eye size={12} aria-label="Reach" /> {fmt(p.reach)}</span>
+                    <span title="Saves"><Bookmark size={12} aria-label="Saves" /> {fmt(p.saves)}</span>
+                    <span title="Conversations"><MessageCircle size={12} aria-label="Conversations" /> {p.conversations}</span>
+                  </div>
                 </div>
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </div>
         </section>
       </div>
 
-      <p className="au-note"><ShieldCheck size={16} aria-hidden /> Based on Instagram Insights (aggregated, available from 100 followers), your conversations and your Grow results. We never profile individual people or guess sensitive traits. <Info size={14} aria-hidden /> Demo data.</p>
-    </>
+      <section aria-labelledby="au-recs">
+        <h2 id="au-recs" className="au-section-title"><Lightbulb size={18} aria-hidden /> Do this next</h2>
+        <div className="au-recs">
+          {data.recommendations.map((r) => {
+            const Icon = r.action === 'flow' ? Workflow : r.action === 'topic' ? Target : Clock;
+            return (
+              <button key={r.title} className="au-rec" onClick={() => runRec(r)} title={r.body}>
+                <span className="au-rec-icon"><Icon size={20} aria-hidden /></span>
+                <strong>{r.title}</strong>
+                <span className="au-rec-cta">{r.action === 'flow' ? 'Create Lead Flow' : r.action === 'topic' ? 'Add to Grow' : 'Open Planner'} →</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <p className="au-note"><ShieldCheck size={15} aria-hidden /> Aggregated Instagram Insights + your own results. Personas are AI estimates of groups, never individuals. Demo data.</p>
+    </div>
   );
 }
