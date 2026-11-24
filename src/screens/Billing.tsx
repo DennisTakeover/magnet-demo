@@ -57,7 +57,7 @@ function BillingHome() {
 
   return (
     <>
-      <PageHeader title="Billing" subtitle="Your modules, invoices and subscription. Change or cancel any time, right here." />
+      <PageHeader title="Billing" subtitle="Your plan, modules and invoices." />
 
       {b.trialEnd && b.status !== 'ended' && (
         <div className="banner trial-banner" role="status">

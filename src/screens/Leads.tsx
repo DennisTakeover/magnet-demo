@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
-  AlertCircle, ArrowRight, CalendarPlus, CheckCircle2, Clock, Inbox as InboxIcon, MessageCircle, Plus, Search, Sparkles, Target, Trophy, Users,
+  AlertCircle, ArrowRight, CalendarPlus, CheckCircle2, Clock, Inbox as InboxIcon, MessageCircle, Plus, Search, Sparkles, Target, Trophy, Users, Workflow, Film, UserPlus, TrendingUp, MessageSquare,
 } from 'lucide-react';
 import { clientLog, navigate, uid, usePersona, useStore } from '../store';
 import UpgradeHint from '../components/UpgradeHint';
@@ -103,6 +103,8 @@ export default function Leads({ openId }: { openId?: string }) {
 
 /* ───────────── Dashboard ───────────── */
 
+const SOURCE_ICON: Record<string, typeof Users> = { 'Lead Flow': Workflow, 'Direct message': MessageCircle, 'Story reply': Film, Referral: UserPlus, Grow: TrendingUp, Comment: MessageSquare };
+
 function LeadDashboard({ state, attention, stage4Plural }: { state: State; attention: Attention[]; stage4Plural: string }) {
   const now = Date.now();
   const all = state.leads;
@@ -117,7 +119,6 @@ function LeadDashboard({ state, attention, stage4Plural }: { state: State; atten
   const medianAge = ages.length ? ages[Math.floor(ages.length / 2)] : null;
 
   const stages = LEAD_STATUSES.map((s) => ({ ...s, n: all.filter((l) => l.status === s.id).length }));
-  const maxStage = Math.max(1, ...stages.map((s) => s.n));
 
   const bySource = Object.entries(all.reduce<Record<string, { n: number; won: number; q: number }>>((acc, l) => {
     const g = sourceGroup(l.source);
@@ -144,22 +145,22 @@ function LeadDashboard({ state, attention, stage4Plural }: { state: State; atten
         <div className="metric">
           <div className="metric-top"><Users size={18} className="metric-icon" aria-hidden /><span className="metric-label">Open leads</span></div>
           <span className="metric-value">{openLeads.length}</span>
-          <span className="metric-def">{newWeek} new this week{delta !== 0 && <> · <span className={delta > 0 ? 'up' : 'down'}>{delta > 0 ? '+' : ''}{delta} vs last week</span></>}</span>
+          <span className="metric-def"><span className="up">+{newWeek}</span> this week{delta !== 0 && <> · <span className={delta > 0 ? 'up' : 'down'}>{delta > 0 ? '▲' : '▼'} {Math.abs(delta)}</span></>}</span>
         </div>
         <div className="metric">
           <div className="metric-top"><AlertCircle size={18} className="metric-icon" aria-hidden /><span className="metric-label">Need your attention</span></div>
           <span className="metric-value">{attention.length}</span>
-          <span className="metric-def">New, waiting on a task or quiet for 3+ days</span>
+          <span className="metric-def" title="New, waiting on a task or quiet for 3+ days">Waiting on you</span>
         </div>
         <div className="metric">
           <div className="metric-top"><Target size={18} className="metric-icon" aria-hidden /><span className="metric-label">{stage4Plural}</span></div>
           <span className="metric-value">{booked}</span>
-          <span className="metric-def">{all.length ? Math.round((qualifiedPlus / all.length) * 100) : 0}% of all leads reached Qualified or further</span>
+          <span className="metric-def" title="Share of all leads that reached Qualified or further"><span className="mini-meter"><span style={{ width: `${all.length ? Math.round((qualifiedPlus / all.length) * 100) : 0}%` }} /></span> {all.length ? Math.round((qualifiedPlus / all.length) * 100) : 0}% qualified</span>
         </div>
         <div className="metric">
           <div className="metric-top"><Trophy size={18} className="metric-icon" aria-hidden /><span className="metric-label">Won</span></div>
           <span className="metric-value">{won}</span>
-          <span className="metric-def">{closed ? `${Math.round((won / closed) * 100)}% of ${closed} closed leads` : 'No closed leads yet'}{medianAge != null ? ` · open leads are ${medianAge < 1 ? '<1' : Math.round(medianAge)} days old (median)` : ''}</span>
+          <span className="metric-def" title={medianAge != null ? `Open leads are ${medianAge < 1 ? '<1' : Math.round(medianAge)} days old (median)` : undefined}>{closed ? <><span className="mini-meter"><span style={{ width: `${Math.round((won / closed) * 100)}%` }} /></span> {Math.round((won / closed) * 100)}% win rate</> : 'No closed leads yet'}</span>
         </div>
       </div>
 
@@ -193,30 +194,28 @@ function LeadDashboard({ state, attention, stage4Plural }: { state: State; atten
 
         <section className="card" aria-labelledby="stage-h">
           <h2 id="stage-h">Pipeline by stage</h2>
-          <ul className="hbars" aria-label="Number of leads per stage">
-            {stages.map((s) => (
-              <li key={s.id} title={`${s.label}: ${s.n} lead${s.n === 1 ? '' : 's'}`}>
-                <span className="hbar-label">{s.label}</span>
-                <span className="hbar-track"><span className="hbar-fill" style={{ width: `${(s.n / maxStage) * 100}%` }} /></span>
-                <span className="hbar-value">{s.n}</span>
+          <ol className="funnel" aria-label="Number of leads per stage">
+            {stages.map((s, i) => (
+              <li key={s.id} title={`${s.label}: ${s.n} lead${s.n === 1 ? '' : 's'}`} style={{ ['--w' as string]: `${100 - i * 12}%`, ['--o' as string]: `${1 - i * 0.14}` }}>
+                <span className="funnel-bar"><strong>{s.n}</strong></span>
+                <span className="funnel-label">{s.label}</span>
               </li>
             ))}
-          </ul>
-          <p className="muted xsmall">Current stage of every lead. A link sent is not a booking; only confirmed events count.</p>
+          </ol>
         </section>
 
         <section className="card" aria-labelledby="src-h">
           <h2 id="src-h">Where leads come from</h2>
-          <ul className="hbars" aria-label="Leads per source">
+          <ul className="hbars src-bars" aria-label="Leads per source">
             {bySource.map(([name, v]) => (
               <li key={name} title={`${name}: ${v.n} leads, ${v.q} qualified or further, ${v.won} won`}>
-                <span className="hbar-label">{name}</span>
+                <span className="hbar-label src-label">{(() => { const I = SOURCE_ICON[name] ?? Users; return <I size={14} aria-hidden />; })()} {name}</span>
                 <span className="hbar-track"><span className="hbar-fill" style={{ width: `${(v.n / maxSource) * 100}%` }} /></span>
-                <span className="hbar-value">{v.n}<span className="muted xsmall"> · {v.q} qual.</span></span>
+                <span className="hbar-value">{v.n}{v.q > 0 && <span className="q-dot" title={`${v.q} qualified or further`}>{v.q}✓</span>}</span>
               </li>
             ))}
           </ul>
-          <p className="muted xsmall">“qual.” = reached Qualified or further.</p>
+          <p className="muted xsmall">✓ = reached Qualified or further</p>
         </section>
 
         <section className="card trend-card" aria-labelledby="trend-h">

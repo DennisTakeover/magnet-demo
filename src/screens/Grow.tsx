@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Check, Pause, Play, Plus, Ban, Undo2, ShieldCheck, CircleSlash, CircleCheck } from 'lucide-react';
+import { Check, Pause, Play, Plus, Ban, Undo2, ShieldCheck, CircleSlash, CircleCheck, Hash, Languages, Globe2, TrendingUp, Radar, Zap } from 'lucide-react';
 import { clientLog, markActivation, uid, usePersona, useStore } from '../store';
 import OpsBanner from '../components/OpsBanner';
 import { blockedBy } from '../ops';
 import { t } from '../i18n/locale';
-import { AiTag, Badge, CampaignBadge, ChipInput, Field, Modal, PageHeader, Segmented, timeAgo } from '../components/ui';
+import { AiTag, Badge, CampaignBadge, ChipInput, Field, HandleAvatar, InfoTip, Modal, PageHeader, Ring, Segmented, timeAgo } from '../components/ui';
 import type { Source } from '../types';
 
 type Filter = 'all' | Source['status'];
@@ -108,19 +108,19 @@ export default function Grow() {
             {disconnected ? 'Reconnect Instagram' : state.promoview === 'pending' ? 'Wait until the growth service confirms your account' : 'Connect the growth engine'} before starting the campaign. <a href="#/app/connect">Go to connections</a>
           </p>
         )}
-        <div className="campaign-stats">
-          <div className="interactions-stat">
-            <span className="row between">
-              <span className="muted small">Interactions today</span>
-              <span className="small"><strong>{inter.today}</strong> / {inter.dailyLimit}</span>
-            </span>
-            <span className="meter" role="meter" aria-valuemin={0} aria-valuemax={inter.dailyLimit} aria-valuenow={inter.today} aria-label="Interactions today">
-              <span style={{ width: `${Math.min(100, (inter.today / inter.dailyLimit) * 100)}%` }} />
-            </span>
-            <span className="muted xsmall">MAGNET engages with people in your audience on your behalf, within a safe daily limit.</span>
+        <div className="campaign-stats visual">
+          <div className="cs-tile" title="MAGNET engages with people in your audience on your behalf, within a safe daily limit.">
+            <Ring value={inter.today} max={inter.dailyLimit} size={56} label="Interactions today"><strong>{Math.round((inter.today / inter.dailyLimit) * 100)}</strong><span>%</span></Ring>
+            <span><strong className="cs-big">{inter.today}<span className="cs-of">/{inter.dailyLimit}</span></strong><span className="muted small">interactions today</span></span>
           </div>
-          <div><span className="metric-value sm">+{persona.metrics['28'].growth.toLocaleString('en-GB')}</span><span className="muted small">Net follower growth, 28 days (sample)</span></div>
-          <div><span className="metric-value sm">{accepted.length}</span><span className="muted small">Active sources · {suggested.length} to review</span></div>
+          <div className="cs-tile">
+            <span className="cs-icon green"><TrendingUp size={22} aria-hidden /></span>
+            <span><strong className="cs-big">+{persona.metrics['28'].growth.toLocaleString('en-GB')}</strong><span className="muted small">followers · 28 days</span></span>
+          </div>
+          <div className="cs-tile">
+            <span className="cs-icon"><Radar size={22} aria-hidden /></span>
+            <span><strong className="cs-big">{accepted.length}</strong><span className="muted small">sources{suggested.length > 0 && <> · <b className="cs-pill">{suggested.length} new</b></>}</span></span>
+          </div>
         </div>
       </section>
 
@@ -130,10 +130,10 @@ export default function Grow() {
             <h2 id="crit">Audience</h2>
             {dirty && <Badge tone="amber">Unsaved changes</Badge>}
           </div>
-          <Field label="Topics"><ChipInput label="Topics" values={aud.topics} onChange={(v) => editAud({ topics: v })} placeholder="Add a topic and press Enter" /></Field>
-          <Field label="Languages"><ChipInput label="Languages" values={aud.languages} onChange={(v) => editAud({ languages: v })} placeholder="Add a language" /></Field>
-          <Field label="Regions"><ChipInput label="Regions" values={aud.regions} onChange={(v) => editAud({ regions: v })} placeholder="Add a region" /></Field>
-          <Field label="Exclude"><ChipInput label="Exclusions" values={aud.exclusions} onChange={(v) => editAud({ exclusions: v })} placeholder="Add an exclusion" /></Field>
+          <Field label="Topics" icon={Hash}><ChipInput label="Topics" values={aud.topics} onChange={(v) => editAud({ topics: v })} placeholder="Add a topic and press Enter" /></Field>
+          <Field label="Languages" icon={Languages}><ChipInput label="Languages" values={aud.languages} onChange={(v) => editAud({ languages: v })} placeholder="Add a language" /></Field>
+          <Field label="Regions" icon={Globe2}><ChipInput label="Regions" values={aud.regions} onChange={(v) => editAud({ regions: v })} placeholder="Add a region" /></Field>
+          <Field label="Exclude" icon={Ban}><ChipInput label="Exclusions" values={aud.exclusions} onChange={(v) => editAud({ exclusions: v })} placeholder="Add an exclusion" /></Field>
           <div className="row end">
             {dirty && <button className="btn btn-ghost" onClick={() => { setAud(state.audience); setDirty(false); }}>Discard</button>}
             <button className="btn btn-primary" onClick={saveAudience} disabled={!dirty}>Save audience</button>
@@ -142,18 +142,19 @@ export default function Grow() {
 
         <section className="card" aria-labelledby="src">
           <div className="card-head">
-            <h2 id="src">Source accounts</h2>
+            <h2 id="src" className="row gap-sm">Source accounts <InfoTip>Sources are search directions: we look for people with similar interests. Their followers won’t automatically become clients.</InfoTip></h2>
             <Segmented label="Filter sources" value={filter} onChange={setFilter} options={[{ id: 'all', label: 'All' }, { id: 'suggested', label: 'To review' }, { id: 'accepted', label: 'Accepted' }, { id: 'excluded', label: 'Excluded' }]} />
           </div>
-          <p className="muted small">Sources are search directions: we look for people with similar interests. Their followers won’t automatically become clients.</p>
           <ul className="source-list">
             {shown.map((s) => (
               <li key={s.id} className={`source ${s.status}`}>
                 <div className="source-main">
-                  <div>
-                    <strong>{s.handle}</strong> <span className="muted small">{s.name}</span>
-                    <div className="small source-reason">
-                      {s.status === 'suggested' && <AiTag>Why suggested</AiTag>} {s.reason}
+                  <HandleAvatar handle={s.handle} />
+                  <div className="source-text">
+                    <strong>{s.handle}</strong>
+                    <div className="source-chips">
+                      {s.status === 'suggested' && <AiTag>Suggested</AiTag>}
+                      <span className="source-topic" title={s.reason}><Zap size={12} aria-hidden /> {s.topic}</span>
                     </div>
                   </div>
                   <div className="row gap-sm">
@@ -172,7 +173,7 @@ export default function Grow() {
                 {reviewing === s.id && (
                   <div className="review-box">
                     <p className="small">
-                      Topic: <strong>{s.topic}</strong>. Accepting adds it as a search direction for the campaign.
+                      <AiTag>Why</AiTag> {s.reason}
                     </p>
                     <div className="row gap-sm">
                       <button className="btn btn-sm btn-primary" onClick={() => setSource(s.id, 'accepted')}><Check size={14} /> Accept</button>
@@ -263,12 +264,11 @@ function Filters() {
     <section className="card" aria-labelledby="filters">
       <div className="card-head">
         <h2 id="filters">Filters</h2>
-        <span className="muted small">Skipped by blocked words in the last 28 days: <strong>{state.interactions.skippedByBlockedWords}</strong> (sample)</span>
+        <span className="cs-pill big" title="Skipped by blocked words in the last 28 days (sample)"><CircleSlash size={14} aria-hidden /> {state.interactions.skippedByBlockedWords} skipped · 28 days</span>
       </div>
       <div className="grid-2">
         <div className="filter-col">
-          <span className="filter-title"><CircleSlash size={18} aria-hidden /> Blocked words</span>
-          <p className="muted small">People with one of these words in their name or bio are skipped. MAGNET never interacts with them.</p>
+          <span className="filter-title"><CircleSlash size={18} aria-hidden /> Blocked words <InfoTip>People with one of these words in their name or bio are skipped. MAGNET never interacts with them.</InfoTip></span>
           <ChipInput label="Blocked words" values={words} onChange={(v) => setWords(v.map((w) => w.toLowerCase()))} placeholder="Add a word and press Enter" />
           <div className="tester mt">
             <Field label="Try a name or bio">
@@ -280,10 +280,8 @@ function Filters() {
           </div>
         </div>
         <div className="filter-col">
-          <span className="filter-title"><ShieldCheck size={18} aria-hidden /> Protected accounts</span>
-          <p className="muted small">Friends, partners and customers you always want to keep. MAGNET never removes them from your interactions.</p>
+          <span className="filter-title"><ShieldCheck size={18} aria-hidden /> Protected accounts <InfoTip>Friends, partners and customers you always want to keep. MAGNET never removes them from your interactions.</InfoTip></span>
           <ChipInput label="Protected accounts" values={keep} onChange={(v) => setKeep([...new Set(v.map(normalizeHandle))])} placeholder="@account and press Enter" />
-          <p className="muted xsmall mt">Tip: add your team, your partners and your best customers.</p>
         </div>
       </div>
       <div className="row end">

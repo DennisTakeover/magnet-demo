@@ -37,21 +37,31 @@ export default function LeadFlows() {
                 <h2><a href={`#/app/flows/${f.id}`}>{f.name}</a></h2>
                 <FlowStatusBadge status={f.status} />
               </div>
-              <dl className="kv">
-                <dt>Trigger</dt>
-                <dd>
-                  {f.trigger.type === 'comment' ? <MessagesSquare size={14} aria-hidden /> : <MessageCircle size={14} aria-hidden />}{' '}
-                  {f.trigger.type === 'comment' ? `Comment on “${post?.title ?? 'no post selected'}”` : 'Incoming DM'}
-                </dd>
-                <dt>Keyword</dt>
-                <dd><span className="kw">{f.trigger.keyword || '—'}</span></dd>
-                <dt>Resource</dt>
-                <dd>{f.resource.kind === 'pdf' ? <FileText size={14} aria-hidden /> : <Link2 size={14} aria-hidden />} {f.resource.title}</dd>
-              </dl>
-              <div className="flow-stats">
-                <div><strong>{f.stats.requesters}</strong><span>unique requests</span></div>
-                <div><strong>{f.stats.sent}</strong><span>sent</span></div>
-                <div><strong>{f.stats.replied}</strong><span>replied</span></div>
+              <div className="flow-pipe" aria-label="How this flow works">
+                <span className="fp-node" title={f.trigger.type === 'comment' ? `Comment on “${post?.title ?? 'no post selected'}”` : 'Incoming DM'}>
+                  <span className="fp-icon">{f.trigger.type === 'comment' ? <MessagesSquare size={20} aria-hidden /> : <MessageCircle size={20} aria-hidden />}</span>
+                  <span className="fp-label">{f.trigger.type === 'comment' ? 'Comment' : 'DM'}</span>
+                </span>
+                <span className="fp-arrow" aria-hidden />
+                <span className="fp-node kwnode">
+                  <span className="kw fp-kw">{f.trigger.keyword || '—'}</span>
+                  <span className="fp-label">Keyword</span>
+                </span>
+                <span className="fp-arrow" aria-hidden />
+                <span className="fp-node" title={f.resource.title}>
+                  <span className="fp-icon accent">{f.resource.kind === 'pdf' ? <FileText size={20} aria-hidden /> : <Link2 size={20} aria-hidden />}</span>
+                  <span className="fp-label">{f.resource.kind === 'pdf' ? 'Guide' : 'Link'}</span>
+                </span>
+              </div>
+              <p className="fp-resource">{f.resource.title}</p>
+              <div className="flow-bars" aria-label="Results">
+                {([['Requests', f.stats.requesters], ['Sent', f.stats.sent], ['Replied', f.stats.replied]] as const).map(([label, n]) => (
+                  <div key={label} className="fb-row" title={`${label}: ${n}`}>
+                    <span className="fb-label">{label}</span>
+                    <span className="fb-track"><span style={{ width: `${f.stats.requesters ? (n / f.stats.requesters) * 100 : 0}%` }} /></span>
+                    <strong>{n}</strong>
+                  </div>
+                ))}
               </div>
               <div className="row gap-sm">
                 <a className="btn btn-sm btn-secondary" href={`#/app/flows/${f.id}`}>View results</a>

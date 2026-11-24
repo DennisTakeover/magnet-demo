@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
-import { Sparkles, X } from 'lucide-react';
+import { Info, Sparkles, X, type LucideIcon } from 'lucide-react';
 import DemoControls from './DemoControls';
 import LocalePicker from './LocalePicker';
 import { t } from '../i18n/locale';
@@ -83,6 +83,36 @@ export function AiTag({ children = 'AI' }: { children?: ReactNode }) {
   );
 }
 
+/** Small info icon; the explanation shows on hover and is read by screen readers. */
+export function InfoTip({ children }: { children: string }) {
+  return (
+    <span className="info-tip" tabIndex={0} title={children} aria-label={children} role="note">
+      <Info size={15} aria-hidden />
+    </span>
+  );
+}
+
+/** Progress ring (conic gradient). value/max, label inside. */
+export function Ring({ value, max, size = 88, children, label }: { value: number; max: number; size?: number; children?: ReactNode; label: string }) {
+  const pct = max > 0 ? Math.min(1, value / max) : 0;
+  return (
+    <span className="ring" role="meter" aria-valuemin={0} aria-valuemax={max} aria-valuenow={value} aria-label={label}
+      style={{ width: size, height: size, ['--p' as string]: `${pct * 360}deg` }}>
+      <span className="ring-inner">{children}</span>
+    </span>
+  );
+}
+
+/** Colourful avatar for an Instagram handle. */
+export function HandleAvatar({ handle, size = 40 }: { handle: string; size?: number }) {
+  const h = [...handle].reduce((t, c) => (t * 31 + c.charCodeAt(0)) % 360, 7);
+  return (
+    <span className="handle-avatar" aria-hidden style={{ width: size, height: size, fontSize: size * 0.4, background: `linear-gradient(140deg, hsl(${h} 75% 62%), hsl(${(h + 40) % 360} 70% 48%))` }}>
+      {handle.replace('@', '').charAt(0).toUpperCase()}
+    </span>
+  );
+}
+
 export function Avatar({ name, color, size = 36 }: { name: string; color: string; size?: number }) {
   // First and last name, so "Lotte de Vries" becomes "LV"
   const parts = name.split(' ').filter(Boolean);
@@ -126,10 +156,10 @@ export function Modal({ title, onClose, children, footer, wide }: { title: strin
   );
 }
 
-export function Field({ label, hint, children, error }: { label: string; hint?: string; children: ReactNode; error?: string }) {
+export function Field({ label, hint, children, error, icon: Icon }: { label: string; hint?: string; children: ReactNode; error?: string; icon?: LucideIcon }) {
   return (
     <label className="field">
-      <span className="field-label">{label}</span>
+      <span className="field-label">{Icon && <Icon size={14} aria-hidden className="field-icon" />}{label}</span>
       {children}
       {hint && !error && <span className="field-hint">{hint}</span>}
       {error && <span className="field-error">{error}</span>}

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Check, ClipboardCopy, Lock, Pencil, Plus, SkipForward, Sparkles, Trash2, X } from 'lucide-react';
+import { Ban, Check, CheckCheck, ClipboardCopy, Eye, Lightbulb, Lock, Pencil, Plus, Repeat2, Send, SkipForward, Sparkles, ThumbsUp, Trash2, X } from 'lucide-react';
 import { clientLog, markActivation, uid, useStore } from '../store';
 import OpsBanner from '../components/OpsBanner';
 import { blockedBy } from '../ops';
-import { Avatar, Badge, Field, Modal, PageHeader, Segmented, timeAgo } from '../components/ui';
+import { Avatar, Badge, Field, HandleAvatar, InfoTip, Modal, PageHeader, Segmented, timeAgo } from '../components/ui';
 import { PostTile } from './Planner';
 import type { CommentDraft, CommentState } from '../types';
 
@@ -88,7 +88,7 @@ export default function Comments() {
     <>
       <PageHeader
         title="Be seen where your audience already is."
-        subtitle="Pick accounts your ideal customers follow. MAGNET drafts a useful comment for their posts; you review every one before it goes out."
+        subtitle="Show up on the accounts your audience follows."
         actions={<button className="btn btn-primary" onClick={() => setAddOpen(true)}><Plus size={16} /> Add a post</button>}
       />
       <OpsBanner module="comments" />
@@ -96,15 +96,15 @@ export default function Comments() {
       <div className="cm-notice">
         <Lock size={16} aria-hidden />
         <span>
-          <strong>Automatic posting is off.</strong> It stays off until posting to other accounts is verified for your account. Approved comments are copied and posted by you.
+          <strong>You post approved comments yourself.</strong> <InfoTip>Automatic posting stays off until posting to other accounts is verified for your account.</InfoTip>
         </span>
       </div>
 
       <div className="metric-grid cm-stats">
-        <div className="metric"><span className="metric-label">To review</span><span className="metric-value">{count('review')}</span></div>
-        <div className="metric"><span className="metric-label">Approved, not posted</span><span className="metric-value">{count('approved')}</span></div>
-        <div className="metric"><span className="metric-label">Posted by you today</span><span className="metric-value">{postedToday} <span className="cm-cap">/ {DAILY_CAP}</span></span></div>
-        <div className="metric"><span className="metric-label">Skipped</span><span className="metric-value">{count('skipped')}</span></div>
+        <div className="metric cm-stat"><span className="cm-stat-icon amber"><Eye size={20} aria-hidden /></span><span><span className="metric-value">{count('review')}</span><span className="metric-label">To review</span></span></div>
+        <div className="metric cm-stat"><span className="cm-stat-icon blue"><ThumbsUp size={20} aria-hidden /></span><span><span className="metric-value">{count('approved')}</span><span className="metric-label">Ready to post</span></span></div>
+        <div className="metric cm-stat"><span className="cm-stat-icon green"><Send size={20} aria-hidden /></span><span><span className="metric-value">{postedToday}<span className="cm-cap"> / {DAILY_CAP}</span></span><span className="metric-label">Posted today</span><span className="mini-meter" role="meter" aria-label="Posted today" aria-valuenow={postedToday} aria-valuemax={DAILY_CAP}><span style={{ width: `${(postedToday / DAILY_CAP) * 100}%` }} /></span></span></div>
+        <div className="metric cm-stat"><span className="cm-stat-icon"><SkipForward size={20} aria-hidden /></span><span><span className="metric-value">{count('skipped')}</span><span className="metric-label">Skipped</span></span></div>
       </div>
 
       <div className="cm-layout">
@@ -188,12 +188,12 @@ export default function Comments() {
         </section>
 
         <aside className="card cm-targets" aria-labelledby="targets">
-          <h2 id="targets">Target accounts</h2>
-          <p className="muted small">Accounts whose followers match your audience. Their new posts show up in your queue.</p>
+          <h2 id="targets" className="row gap-sm">Target accounts <InfoTip>Accounts whose followers match your audience. Their new posts show up in your queue.</InfoTip></h2>
           <ul className="cm-target-list">
             {state.commentTargets.map((t) => (
-              <li key={t.id}>
-                <span>
+              <li key={t.id} title={t.reason}>
+                <HandleAvatar handle={t.handle} size={36} />
+                <span className="cm-target-text">
                   <strong>{t.handle}</strong>
                   <span className="muted xsmall">{t.reason}</span>
                 </span>
@@ -217,11 +217,11 @@ export default function Comments() {
           </form>
           <div className="cm-rules">
             <strong>How drafts are written</strong>
-            <ul>
-              <li>Adds something useful to the post: a tip or a question</li>
-              <li>No made-up personal stories</li>
-              <li>No generic praise and no links to your shop</li>
-              <li>Never the same comment twice</li>
+            <ul className="cm-rule-icons">
+              <li><Lightbulb size={16} aria-hidden /> Useful tip or question</li>
+              <li><Ban size={16} aria-hidden /> No made-up stories</li>
+              <li><CheckCheck size={16} aria-hidden /> No generic praise or links</li>
+              <li><Repeat2 size={16} aria-hidden /> Never the same twice</li>
             </ul>
           </div>
         </aside>

@@ -77,7 +77,7 @@ export default function Help() {
   const f1 = state.flows[0];
   const articles = ARTICLES.filter((a) => !search || `${a.title} ${a.body} ${a.keywords.join(' ')}`.toLowerCase().includes(search.toLowerCase()));
 
-  useEffect(() => endRef.current?.scrollIntoView({ block: 'nearest' }), [msgs.length]);
+  useEffect(() => { endRef.current?.scrollIntoView({ block: 'nearest' }); }, [msgs.length]);
 
   const ask = (text: string) => {
     if (!text.trim()) return;
@@ -98,7 +98,7 @@ export default function Help() {
 
   return (
     <>
-      <PageHeader title={t('nav.help')} subtitle="Ask a question, read an article or reach a person on our team." />
+      <PageHeader title={t('nav.help')} subtitle="Answers, articles and real people." />
       <div className="help-grid">
         <section className="card help-chat" aria-labelledby="chat-h">
           <div className="card-head">

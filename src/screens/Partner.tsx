@@ -86,7 +86,7 @@ function Apply({ rec }: { rec?: PartnerRecord }) {
 
   return (
     <>
-      <PageHeader title="Partner Program" subtitle="Promote MAGNET to your network. Approved partners get complimentary access and a share of recurring results from customers they refer." />
+      <PageHeader title="Partner Program" subtitle="Share MAGNET, earn 25% for as long as they stay." />
 
       {rec && status !== 'draft' && <StatusCard rec={rec} />}
 

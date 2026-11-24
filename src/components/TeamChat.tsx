@@ -9,7 +9,7 @@ export const TEAM_CONTACT = 'Sophie Laurent';
 
 export function ChatBubbles({ msgs, side }: { msgs: TeamChatMessage[]; side: 'client' | 'team' }) {
   const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => endRef.current?.scrollIntoView({ block: 'nearest' }), [msgs.length]);
+  useEffect(() => { endRef.current?.scrollIntoView({ block: 'nearest' }); }, [msgs.length]);
   return (
     <div className="tc-log" aria-live="polite">
       {msgs.length === 0 && <p className="muted small center">No messages yet. Say hello.</p>}

@@ -1,4 +1,4 @@
-import { Check, ChevronRight, Cpu, Instagram, X } from 'lucide-react';
+import { Bot, CalendarClock, Check, Cpu, Instagram, MessageSquareText, Rocket, Target, Workflow, X, type LucideIcon } from 'lucide-react';
 import { useStore } from '../store';
 import { Badge } from './ui';
 import type { ActivationKey, GoalId, ModuleId, State } from '../types';
@@ -10,6 +10,11 @@ interface Item {
   href: string;
   module: ModuleId | null;
 }
+
+const ICON: Record<ActivationKey, LucideIcon> = {
+  connect_meta: Instagram, connect_growth: Cpu, audience_saved: Target, campaign_started: Rocket,
+  ai_reply: Bot, flow_activated: Workflow, comment_approved: MessageSquareText, post_scheduled: CalendarClock,
+} as Record<ActivationKey, LucideIcon>;
 
 const ITEMS: Item[] = [
   { key: 'connect_meta', title: 'Connect Instagram', why: 'Needed for DMs, Lead Flows and publishing.', href: '/app/connect', module: null },
@@ -79,22 +84,29 @@ export default function Checklist() {
             </div>
             <button className="btn btn-ghost btn-sm" onClick={() => update((d) => void (d.activation.dismissed = true))}><X size={14} /> Hide</button>
           </div>
-          <div className="checklist-bar" aria-hidden><span style={{ width: `${(done / items.length) * 100}%` }} /></div>
-          <ul className="checklist-items">
-            {items.map((i) => {
-              const ok = Boolean(a.done[i.key]);
-              return (
-                <li key={i.key} className={ok ? 'ok' : ''}>
-                  <span className="ck-mark" aria-label={ok ? 'Done' : 'To do'}>{ok ? <Check size={14} /> : null}</span>
-                  <span className="ck-text">
-                    <strong>{i.title}</strong>
-                    <span className="muted small">{i.why}</span>
-                  </span>
-                  {!ok && <a className="btn btn-sm btn-soft" href={`#${i.href}`}>Start <ChevronRight size={14} /></a>}
-                </li>
-              );
-            })}
-          </ul>
+          <div className="ck-body">
+            <div className="ck-ring" role="img" aria-label={`${done} of ${items.length} steps done`} style={{ ['--p' as string]: `${(done / items.length) * 360}deg` }}>
+              <span><strong>{done}</strong>/{items.length}</span>
+            </div>
+            <ul className="ck-steps">
+              {items.map((i) => {
+                const ok = Boolean(a.done[i.key]);
+                const Icon = ICON[i.key] ?? Check;
+                const inner = (
+                  <>
+                    <span className="ck-icon" aria-hidden>{ok ? <Check size={18} /> : <Icon size={18} />}</span>
+                    <span className="ck-title">{i.title}</span>
+                    <span className="ck-state">{ok ? 'Done' : 'Start →'}</span>
+                  </>
+                );
+                return (
+                  <li key={i.key} className={ok ? 'ok' : ''} title={i.why}>
+                    {ok ? <div className="ck-step">{inner}</div> : <a className="ck-step" href={`#${i.href}`}>{inner}</a>}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </section>
       )}
     </>
