@@ -3,7 +3,7 @@ import { entitledModules } from './partners';
 
 /** Route segment → module a member needs for it. Core pages need nothing extra. */
 export const ROUTE_MODULE: Record<string, ModuleId | 'owner' | null> = {
-  overview: null, leads: null, help: null, settings: null,
+  overview: null, audience: null, leads: null, help: null, settings: null,
   grow: 'grow', inbox: 'inbox', flows: 'flows', comments: 'comments', planner: 'planner',
   billing: 'owner', partner: 'owner', dfy: 'owner', connect: 'owner',
 };

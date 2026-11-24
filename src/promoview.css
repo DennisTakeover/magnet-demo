@@ -116,3 +116,5 @@ html[data-brand=promoview], [data-brand=promoview] body { background: var(--surf
 [data-brand=promoview] .pv-case:nth-child(4n + 3) { background: var(--surface-2); }
 [data-brand=promoview] .pv-case:nth-child(4n + 4) { background: var(--surface-2); }
 [data-brand=promoview] .pv-compare { border: 1px solid var(--line); }
+[data-brand=promoview] .au-personas { background: var(--surface-2); }
+[data-brand=promoview] .au-persona { background: var(--surface); }

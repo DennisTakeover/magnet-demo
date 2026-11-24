@@ -7,6 +7,7 @@ type Row = [en: string, nl: string, de: string, fr: string, es: string, pt: stri
 export const STRINGS: Record<string, Row> = {
   /* Navigation */
   'nav.overview': ['Overview', 'Overzicht', 'Übersicht', 'Vue d’ensemble', 'Resumen', 'Visão geral', 'Panoramica'],
+  'nav.audience': ['Audience', 'Doelgroep', 'Zielgruppe', 'Audience', 'Audiencia', 'Público', 'Pubblico'],
   'nav.grow': ['Grow', 'Groei', 'Wachstum', 'Croissance', 'Crecimiento', 'Crescimento', 'Crescita'],
   'nav.inbox': ['Inbox', 'Inbox', 'Posteingang', 'Messages', 'Bandeja de entrada', 'Caixa de entrada', 'Posta in arrivo'],
   'nav.flows': ['Lead Flows', 'Lead Flows', 'Lead Flows', 'Lead Flows', 'Lead Flows', 'Lead Flows', 'Lead Flow'],

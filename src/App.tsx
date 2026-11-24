@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   House, BarChart3, MessageCircle, Link2, Users, CalendarDays, Settings as SettingsIcon, HelpCircle,
-  Activity as ActivityIcon, Building2, LifeBuoy, Gauge, Menu, X, CheckCircle2, Info, AlertTriangle, XCircle, WifiOff, Rocket, MessagesSquare, CreditCard, Lock, Handshake, Tags, LineChart,
+  Activity as ActivityIcon, Building2, LifeBuoy, Gauge, Menu, X, CheckCircle2, Info, AlertTriangle, XCircle, WifiOff, Rocket, MessagesSquare, CreditCard, Lock, Handshake, PieChart, Tags, LineChart,
 } from 'lucide-react';
 import { useRoute, useStore } from './store';
 import { applyStage4Label, Avatar, Skeleton } from './components/ui';
@@ -15,6 +15,7 @@ import Entry from './screens/Entry';
 import Onboarding from './screens/Onboarding';
 import Overview from './screens/Overview';
 import Grow from './screens/Grow';
+import Audience from './screens/Audience';
 import Inbox from './screens/Inbox';
 import LeadFlows from './screens/LeadFlows';
 import FlowBuilder from './screens/FlowBuilder';
@@ -52,6 +53,7 @@ export function Logo({ size = 28 }: { size?: number }) {
 const CLIENT_NAV = [
   { path: '/app/overview', tkey: 'nav.overview', icon: House },
   { path: '/app/grow', tkey: 'nav.grow', icon: BarChart3 },
+  { path: '/app/audience', tkey: 'nav.audience', icon: PieChart },
   { path: '/app/inbox', tkey: 'nav.inbox', icon: MessageCircle },
   { path: '/app/flows', tkey: 'nav.flows', icon: Link2 },
   { path: '/app/comments', tkey: 'nav.comments', icon: MessagesSquare },
@@ -194,7 +196,7 @@ function Shell({ role, path, children }: { role: 'client' | 'admin'; path: strin
       </div>
       {role === 'client' && (
         <nav className="bottom-nav" aria-label="Quick navigation">
-          {CLIENT_NAV.filter((n) => !['/app/planner', '/app/dfy', '/app/comments'].includes(n.path)).map((n) => {
+          {CLIENT_NAV.filter((n) => !['/app/planner', '/app/dfy', '/app/comments', '/app/audience'].includes(n.path)).map((n) => {
             const Icon = n.icon;
             const active = section === n.path;
             return (
@@ -238,6 +240,7 @@ export default function App() {
     switch (parts[1]) {
       case 'overview': page = <Overview />; break;
       case 'grow': page = <Grow />; break;
+      case 'audience': page = <Audience />; break;
       case 'inbox': page = <Inbox id={parts[2]} />; break;
       case 'flows':
         if (parts[2] === 'new') page = <FlowBuilder />;
